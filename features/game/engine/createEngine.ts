@@ -1,3 +1,4 @@
+import type { Shelter } from "@/features/stage/types";
 import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
@@ -51,6 +52,21 @@ export function createEngine(config: EngineConfig): Engine {
     return input.left || input.right ? 1 : STILL_TIME_SCALE;
   }
 
+  function shelterRoof(s: Shelter): {
+    left: number;
+    right: number;
+    top: number;
+  } {
+    switch (s.variant) {
+      case "busStop":
+        return { left: s.x - 55, right: s.x + 55, top: GROUND_Y - 88 };
+      case "awning":
+        return { left: s.x - 50, right: s.x + 50, top: GROUND_Y - 110 };
+      case "phoneBooth":
+        return { left: s.x - 22, right: s.x + 22, top: GROUND_Y - 110 };
+    }
+  }
+
   function step(dt: number) {
     if (input.jump && !prevJump && state.jumpsLeft > 0) {
       state.vy = PLAYER_JUMP_VEL;
@@ -101,8 +117,18 @@ export function createEngine(config: EngineConfig): Engine {
       const d = state.drops[i];
       d.x += RAIN_VX * dt * ts;
       d.y += RAIN_VY * dt * ts;
+
       if (d.y > GROUND_Y + 20) {
         state.drops.splice(i, 1);
+        continue;
+      }
+
+      for (const s of stage.shelters) {
+        const r = shelterRoof(s);
+        if (d.y >= r.top && d.x >= r.left && d.x <= r.right) {
+          state.drops.splice(i, 1);
+          break;
+        }
       }
     }
 
@@ -147,6 +173,42 @@ export function createEngine(config: EngineConfig): Engine {
       ctx!.lineTo(sx - sdx, d.y - sdy);
     }
     ctx!.stroke();
+
+    for (const s of stage.shelters) {
+      const sx = s.x - state.cam;
+      if (sx + 60 < 0 || sx - 60 > W) continue;
+
+      if (s.variant === "busStop") {
+        ctx!.fillStyle = "#4a5568";
+        ctx!.fillRect(sx - 50, GROUND_Y - 80, 4, 80);
+        ctx!.fillRect(sx + 46, GROUND_Y - 80, 4, 80);
+        ctx!.fillStyle = "rgba(120,150,180,0.25)";
+        ctx!.fillRect(sx - 46, GROUND_Y - 76, 92, 58);
+        ctx!.fillStyle = "#2d3748";
+        ctx!.fillRect(sx - 55, GROUND_Y - 88, 110, 10);
+        ctx!.fillStyle = "#5d4f3e";
+        ctx!.fillRect(sx - 35, GROUND_Y - 20, 70, 6);
+      } else if (s.variant === "awning") {
+        ctx!.fillStyle = "#3a3a3a";
+        ctx!.fillRect(sx - 50, GROUND_Y - 110, 4, 16);
+        ctx!.fillRect(sx + 46, GROUND_Y - 110, 4, 16);
+        ctx!.fillStyle = "#8b3a3a";
+        ctx!.fillRect(sx - 50, GROUND_Y - 110, 100, 12);
+        ctx!.fillStyle = "#c54a4a";
+        ctx!.fillRect(sx - 50, GROUND_Y - 110, 100, 3);
+      } else if (s.variant === "phoneBooth") {
+        ctx!.fillStyle = "#9b2c2c";
+        ctx!.fillRect(sx - 22, GROUND_Y - 110, 44, 110);
+        ctx!.fillStyle = "#2d2d2d";
+        ctx!.fillRect(sx - 22, GROUND_Y - 110, 44, 14);
+        ctx!.fillStyle = "#f0e0a0";
+        ctx!.fillRect(sx - 18, GROUND_Y - 107, 36, 8);
+        ctx!.fillStyle = "rgba(160,190,210,0.4)";
+        ctx!.fillRect(sx - 18, GROUND_Y - 92, 36, 70);
+        ctx!.fillStyle = "#9b2c2c";
+        ctx!.fillRect(sx - 2, GROUND_Y - 92, 4, 70);
+      }
+    }
 
     const screenX = state.px - state.cam;
     const playerTop = GROUND_Y - state.py - PLAYER_HEIGHT;
