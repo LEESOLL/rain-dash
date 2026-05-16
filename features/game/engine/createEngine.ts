@@ -121,9 +121,17 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.fillStyle = "#5d4f3e";
     ctx!.fillRect(0, GROUND_Y, W, 3);
 
+    for (const p of stage.puddles) {
+      const sx = p.x - state.cam;
+      if (sx + p.width < 0 || sx > W) continue;
+      ctx!.fillStyle = "#3a6fa8";
+      ctx!.fillRect(sx, GROUND_Y - 3, p.width, 8);
+      ctx!.fillStyle = "rgba(180,210,255,0.4)";
+      ctx!.fillRect(sx, GROUND_Y - 3, p.width, 2);
+    }
+
     const ts = getTimeScale();
-    const playerVxRaw =
-      input.right && !input.left ? PLAYER_SPEED : 0;
+    const playerVxRaw = input.right && !input.left ? PLAYER_SPEED : 0;
     const appVx = RAIN_VX - playerVxRaw;
     const appVy = RAIN_VY;
     const mag = Math.sqrt(appVx * appVx + appVy * appVy);
