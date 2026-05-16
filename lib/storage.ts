@@ -3,7 +3,7 @@
  * 추후 서버 연동 시 같은 인터페이스로 swap 가능하도록 단순하게 유지.
  */
 
-export function fetchData<T>(key: string, fallback: T): T {
+export function getData<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
@@ -14,7 +14,7 @@ export function fetchData<T>(key: string, fallback: T): T {
   }
 }
 
-export function createData<T>(key: string, value: T): void {
+export function setData<T>(key: string, value: T): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
@@ -23,7 +23,7 @@ export function createData<T>(key: string, value: T): void {
   }
 }
 
-export function deleteData(key: string): void {
+export function removeData(key: string): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.removeItem(key);

@@ -1,4 +1,4 @@
-import { createData, fetchData } from "@/lib/storage";
+import { setData, getData } from "@/lib/storage";
 import { generateId } from "@/lib/id";
 import type { UserProfile } from "./types";
 
@@ -10,7 +10,7 @@ export function generateDefaultNickname(): string {
 }
 
 export function getUser(): UserProfile | null {
-  return fetchData<UserProfile | null>(KEY, null);
+  return getData<UserProfile | null>(KEY, null);
 }
 
 export function createUser(nickname?: string): UserProfile {
@@ -23,7 +23,7 @@ export function createUser(nickname?: string): UserProfile {
     nickname: cleaned && cleaned.length > 0 ? cleaned : generateDefaultNickname(),
     createdAt: Date.now(),
   };
-  createData(KEY, profile);
+  setData(KEY, profile);
   return profile;
 }
 
@@ -32,6 +32,6 @@ export function changeNickname(nickname: string): UserProfile {
   const existing = getUser();
   if (!existing) return createUser(trimmed);
   const updated = { ...existing, nickname: trimmed };
-  createData(KEY, updated);
+  setData(KEY, updated);
   return updated;
 }

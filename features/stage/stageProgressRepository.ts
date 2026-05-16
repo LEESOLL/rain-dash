@@ -1,4 +1,4 @@
-import { createData, fetchData } from "@/lib/storage";
+import { setData, getData } from "@/lib/storage";
 import type { StageProgress } from "./types";
 
 const KEY = "rd:progress";
@@ -10,7 +10,7 @@ const DEFAULT_PROGRESS: StageProgress = {
 };
 
 export function getProgress(): StageProgress {
-  return fetchData<StageProgress>(KEY, DEFAULT_PROGRESS);
+  return getData<StageProgress>(KEY, DEFAULT_PROGRESS);
 }
 
 export function markCleared(stageId: string): StageProgress {
@@ -21,7 +21,7 @@ export function markCleared(stageId: string): StageProgress {
     ...current,
     clearedStageIds: [...current.clearedStageIds, stageId],
   };
-  createData(KEY, updated);
+  setData(KEY, updated);
   return updated;
 }
 
@@ -34,7 +34,7 @@ export function recordBestScore(stageId: string, score: number): StageProgress {
     ...current,
     bestScores: { ...current.bestScores, [stageId]: score },
   };
-  createData(KEY, updated);
+  setData(KEY, updated);
   return updated;
 }
 
@@ -46,6 +46,6 @@ export function incrementAttemptCount(stageId: string): StageProgress {
     ...current,
     attemptCounts: { ...current.attemptCounts, [stageId]: prevCount + 1 },
   };
-  createData(KEY, updated);
+  setData(KEY, updated);
   return updated;
 }
