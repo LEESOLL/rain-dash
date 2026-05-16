@@ -1,4 +1,13 @@
 import type { Engine, EngineConfig, GameState, Input } from "./types";
+import {
+  AUTO_SCROLL_SPEED,
+  GROUND_Y,
+  PLAYER_HEIGHT,
+  PLAYER_SCREEN_LIMIT_RATIO,
+  PLAYER_SPEED,
+  PLAYER_WIDTH,
+  VIEWPORT_WIDTH,
+} from "./tuning";
 
 export function createEngine(config: EngineConfig): Engine {
   const { canvas, stage, onStateChange } = config;
@@ -28,6 +37,24 @@ export function createEngine(config: EngineConfig): Engine {
   let lastT = 0;
 
   function step(dt: number) {
+    let vx = 0;
+    if (input.right && !input.left) {
+      vx = PLAYER_SPEED;
+      state.facing = 1;
+    } else if (input.left && !input.right) {
+      vx = -PLAYER_SPEED;
+      state.facing = -1;
+    }
+
+    state.cam += AUTO_SCROLL_SPEED * dt;
+    state.px += vx * dt;
+
+    const desiredCam = state.px - VIEWPORT_WIDTH * PLAYER_SCREEN_LIMIT_RATIO;
+    if (desiredCam > state.cam) state.cam = desiredCam;
+
+    if (state.px < state.cam) state.px = state.cam;
+    if (state.px < 0) state.px = 0;
+
     state.realT += dt;
   }
 
@@ -38,10 +65,29 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.fillStyle = "#0d0d18";
     ctx!.fillRect(0, 0, W, H);
 
+    ctx!.fillStyle = "#3a2f24";
+    ctx!.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+    ctx!.fillStyle = "#5d4f3e";
+    ctx!.fillRect(0, GROUND_Y, W, 3);
+
+    const screenX = state.px - state.cam;
+    const playerTop = GROUND_Y - state.py - PLAYER_HEIGHT;
+    ctx!.fillStyle = "#fff";
+    ctx!.fillRect(
+      screenX - PLAYER_WIDTH / 2,
+      playerTop,
+      PLAYER_WIDTH,
+      PLAYER_HEIGHT,
+    );
+
     ctx!.fillStyle = "#888";
     ctx!.font = "22px monospace";
     ctx!.fillText(`stage: ${stage.name}`, 24, 44);
-    ctx!.fillText(`t: ${state.realT.toFixed(2)}s`, 24, 72);
+    ctx!.fillText(
+      `px: ${state.px.toFixed(0)}  cam: ${state.cam.toFixed(0)}`,
+      24,
+      72,
+    );
   }
 
   function loop(now: number) {

@@ -1,5 +1,6 @@
 export const VIEWPORT_WIDTH = 1280;
 export const VIEWPORT_HEIGHT = 720;
+export const GROUND_Y = 576;
 
 export const PLAYER_SPEED = 230;
 export const PLAYER_GRAVITY = 1700;

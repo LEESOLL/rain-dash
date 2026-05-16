@@ -22,8 +22,31 @@ export function GameCanvas({ stage }: Props) {
     const engine = createEngine({ canvas, stage });
     engine.start();
 
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") {
+        engine.setInput({ left: true });
+      }
+      if (e.code === "ArrowRight" || e.code === "KeyD") {
+        engine.setInput({ right: true });
+      }
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") {
+        engine.setInput({ left: false });
+      }
+      if (e.code === "ArrowRight" || e.code === "KeyD") {
+        engine.setInput({ right: false });
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+
     return () => {
       engine.stop();
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
     };
   }, [stage]);
 
