@@ -16,6 +16,17 @@ export type Drop = {
   y: number;
 };
 
+export type LightningPhase = "warn" | "strike" | "linger";
+
+/** 번개 이벤트 — warn → strike → linger 순으로 진행 */
+export type Lightning = {
+  /** 월드 X (낙뢰 중심) */
+  x: number;
+  phase: LightningPhase;
+  /** 현재 phase 남은 시간. warn은 실시간(1.2초 고정), strike/linger는 게임 시간(ts 영향) */
+  t: number;
+};
+
 export type GameState = {
   /** 플레이어 월드 X (오른쪽으로 증가) */
   px: number;
@@ -38,6 +49,12 @@ export type GameState = {
 
   /** 현재 화면에 있는 빗방울들 */
   drops: Drop[];
+
+  /** 진행 중인 번개 이벤트들 */
+  lightnings: Lightning[];
+
+  /** 다음 번개 스폰까지 남은 시간 (실시간 초) — stage.lightning이 null이면 사용 안 함 */
+  nextStrikeT: number;
 
   /** 남은 라이프 — 0이 되면 status가 dead로 전환 */
   lives: number;

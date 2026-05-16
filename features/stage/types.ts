@@ -4,7 +4,10 @@ export type ShelterVariant = "busStop" | "awning" | "phoneBooth";
 
 export type ItemType = "heart" | "raincoat" | "umbrella" | "boots";
 
-export type LightningSchedule = null | { min: number; max: number };
+export type LightningSchedule = null | {
+  gap: { min: number; max: number };
+  warnSec?: number;
+};
 
 export type Shelter = {
   x: number;
@@ -32,7 +35,7 @@ export type Stage = {
   puddles: Puddle[];
   items: Item[];
   rainRate: number;
-  lightningGap: LightningSchedule;
+  lightning: LightningSchedule;
 };
 
 export type BundleStatus = "available" | "coming-soon";

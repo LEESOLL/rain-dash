@@ -21,3 +21,9 @@ export const RAIN_STREAK_LENGTH = 30;
 
 export const MAX_LIVES = 3;
 export const IFRAME_DURATION = 1.0;
+
+export const LIGHTNING_WIDTH = 50;
+export const LIGHTNING_WARN_DURATION = 1.2;
+export const LIGHTNING_STRIKE_DURATION = 0.15;
+export const LIGHTNING_LINGER_DURATION = 0.5;
+export const LIGHTNING_SPAWN_MARGIN = 100;

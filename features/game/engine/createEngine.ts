@@ -4,6 +4,11 @@ import {
   AUTO_SCROLL_SPEED,
   GROUND_Y,
   IFRAME_DURATION,
+  LIGHTNING_LINGER_DURATION,
+  LIGHTNING_SPAWN_MARGIN,
+  LIGHTNING_STRIKE_DURATION,
+  LIGHTNING_WARN_DURATION,
+  LIGHTNING_WIDTH,
   MAX_JUMPS,
   MAX_LIVES,
   PLAYER_GRAVITY,
@@ -29,6 +34,10 @@ export function createEngine(config: EngineConfig): Engine {
   const input: Input = { left: false, right: false, jump: false };
 
   function initialState(): GameState {
+    const initNext = stage.lightning
+      ? stage.lightning.gap.min +
+        Math.random() * (stage.lightning.gap.max - stage.lightning.gap.min)
+      : 0;
     return {
       px: 30,
       py: 0,
@@ -39,6 +48,8 @@ export function createEngine(config: EngineConfig): Engine {
       cam: 0,
       realT: 0,
       drops: [],
+      lightnings: [],
+      nextStrikeT: initNext,
       lives: MAX_LIVES,
       iframeT: 0,
       status: "playing",
@@ -181,6 +192,46 @@ export function createEngine(config: EngineConfig): Engine {
       }
     }
 
+    if (stage.lightning) {
+      state.nextStrikeT -= dt;
+      if (state.nextStrikeT <= 0) {
+        const { min, max } = stage.lightning.gap;
+        const warnSec = stage.lightning.warnSec ?? LIGHTNING_WARN_DURATION;
+        const spawnX =
+          state.cam +
+          LIGHTNING_SPAWN_MARGIN +
+          Math.random() * (VIEWPORT_WIDTH - 2 * LIGHTNING_SPAWN_MARGIN);
+        state.lightnings.push({ x: spawnX, phase: "warn", t: warnSec });
+        state.nextStrikeT = min + Math.random() * (max - min);
+      }
+    }
+
+    for (let i = state.lightnings.length - 1; i >= 0; i--) {
+      const ev = state.lightnings[i];
+      ev.t -= ev.phase === "warn" ? dt : dt * ts;
+      if (ev.t <= 0) {
+        if (ev.phase === "warn") {
+          ev.phase = "strike";
+          ev.t = LIGHTNING_STRIKE_DURATION;
+        } else if (ev.phase === "strike") {
+          ev.phase = "linger";
+          ev.t = LIGHTNING_LINGER_DURATION;
+        } else {
+          state.lightnings.splice(i, 1);
+          continue;
+        }
+      }
+      if (ev.phase === "strike") {
+        const half = LIGHTNING_WIDTH / 2;
+        if (
+          state.px + PLAYER_WIDTH / 2 > ev.x - half &&
+          state.px - PLAYER_WIDTH / 2 < ev.x + half
+        ) {
+          applyDamage();
+        }
+      }
+    }
+
     state.realT += dt;
   }
 
@@ -256,6 +307,49 @@ export function createEngine(config: EngineConfig): Engine {
         ctx!.fillRect(sx - 18, GROUND_Y - 92, 36, 70);
         ctx!.fillStyle = "#9b2c2c";
         ctx!.fillRect(sx - 2, GROUND_Y - 92, 4, 70);
+      }
+    }
+
+    const warnSec = stage.lightning?.warnSec ?? LIGHTNING_WARN_DURATION;
+    for (const ev of state.lightnings) {
+      const sx = ev.x - state.cam;
+      if (sx + LIGHTNING_WIDTH < 0 || sx - LIGHTNING_WIDTH > W) continue;
+
+      if (ev.phase === "warn") {
+        const progress = 1 - ev.t / warnSec;
+        const blinkHz = 3 + progress * 18;
+        const visible = Math.floor(state.realT * blinkHz) % 2 === 0;
+        if (visible) {
+          ctx!.fillStyle = "rgba(255,200,0,0.7)";
+          ctx!.fillRect(
+            sx - LIGHTNING_WIDTH / 2,
+            GROUND_Y - 4,
+            LIGHTNING_WIDTH,
+            8,
+          );
+          ctx!.fillStyle = "rgba(255,80,0,0.9)";
+          ctx!.fillRect(
+            sx - LIGHTNING_WIDTH / 2,
+            GROUND_Y - 6,
+            LIGHTNING_WIDTH,
+            2,
+          );
+        }
+      } else if (ev.phase === "strike") {
+        const strikeProgress = 1 - ev.t / LIGHTNING_STRIKE_DURATION;
+        const tipY = GROUND_Y * strikeProgress;
+        ctx!.fillStyle = "rgba(255,240,100,0.4)";
+        ctx!.fillRect(sx - LIGHTNING_WIDTH / 2, 0, LIGHTNING_WIDTH, tipY);
+        ctx!.fillStyle = "rgba(255,255,255,0.95)";
+        ctx!.fillRect(sx - 4, 0, 8, tipY);
+      } else {
+        ctx!.fillStyle = "rgba(20,20,20,0.7)";
+        ctx!.fillRect(
+          sx - LIGHTNING_WIDTH / 2,
+          GROUND_Y - 2,
+          LIGHTNING_WIDTH,
+          4,
+        );
       }
     }
 
