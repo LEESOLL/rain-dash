@@ -14,3 +14,7 @@ export const STILL_TIME_SCALE = 0.10;
 
 export const AUTO_SCROLL_SPEED = 55;
 export const PLAYER_SCREEN_LIMIT_RATIO = 0.5;
+
+export const RAIN_VX = -90;
+export const RAIN_VY = 540;
+export const RAIN_STREAK_K = 0.06;

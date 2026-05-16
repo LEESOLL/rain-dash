@@ -9,6 +9,9 @@ import {
   PLAYER_SCREEN_LIMIT_RATIO,
   PLAYER_SPEED,
   PLAYER_WIDTH,
+  RAIN_STREAK_K,
+  RAIN_VX,
+  RAIN_VY,
   VIEWPORT_WIDTH,
 } from "./tuning";
 
@@ -31,6 +34,7 @@ export function createEngine(config: EngineConfig): Engine {
       facing: 1,
       cam: 0,
       realT: 0,
+      drops: [],
       status: "playing",
     };
   }
@@ -40,6 +44,7 @@ export function createEngine(config: EngineConfig): Engine {
   let raf: number | null = null;
   let lastT = 0;
   let prevJump = false;
+  let spawnAcc = 0;
 
   function step(dt: number) {
     if (input.jump && !prevJump && state.jumpsLeft > 0) {
@@ -78,6 +83,22 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
 
+    spawnAcc += dt * stage.rainRate;
+    while (spawnAcc >= 1) {
+      spawnAcc -= 1;
+      const spawnX = state.cam - 40 + Math.random() * (VIEWPORT_WIDTH + 160);
+      state.drops.push({ x: spawnX, y: -40 });
+    }
+
+    for (let i = state.drops.length - 1; i >= 0; i--) {
+      const d = state.drops[i];
+      d.x += RAIN_VX * dt;
+      d.y += RAIN_VY * dt;
+      if (d.y > GROUND_Y + 20) {
+        state.drops.splice(i, 1);
+      }
+    }
+
     state.realT += dt;
   }
 
@@ -92,6 +113,22 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.fillRect(0, GROUND_Y, W, H - GROUND_Y);
     ctx!.fillStyle = "#5d4f3e";
     ctx!.fillRect(0, GROUND_Y, W, 3);
+
+    const playerVxRaw =
+      input.right && !input.left ? PLAYER_SPEED : 0;
+    const appVx = RAIN_VX - playerVxRaw;
+    const sdx = appVx * RAIN_STREAK_K;
+    const sdy = RAIN_VY * RAIN_STREAK_K;
+    ctx!.strokeStyle = "rgba(190,210,245,0.78)";
+    ctx!.lineWidth = 1.4;
+    ctx!.beginPath();
+    for (const d of state.drops) {
+      const sx = d.x - state.cam;
+      if (sx < -30 || sx > W + 30) continue;
+      ctx!.moveTo(sx, d.y);
+      ctx!.lineTo(sx - sdx, d.y - sdy);
+    }
+    ctx!.stroke();
 
     const screenX = state.px - state.cam;
     const playerTop = GROUND_Y - state.py - PLAYER_HEIGHT;

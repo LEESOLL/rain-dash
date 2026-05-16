@@ -8,6 +8,14 @@ export type Input = {
 
 export type GameStatus = "playing" | "won" | "dead";
 
+/** 빗방울 (월드 X, 화면 Y) */
+export type Drop = {
+  /** 월드 X (cam과 같은 좌표계) */
+  x: number;
+  /** 화면 Y — 0이 상단, GROUND_Y가 지면 */
+  y: number;
+};
+
 export type GameState = {
   /** 플레이어 월드 X (오른쪽으로 증가) */
   px: number;
@@ -27,6 +35,9 @@ export type GameState = {
 
   /** 게임 시작 후 실제 경과 시간 (초) */
   realT: number;
+
+  /** 현재 화면에 있는 빗방울들 */
+  drops: Drop[];
 
   /** 진행 / 승리 / 사망 */
   status: GameStatus;
