@@ -3,7 +3,9 @@ import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
   GROUND_Y,
+  IFRAME_DURATION,
   MAX_JUMPS,
+  MAX_LIVES,
   PLAYER_GRAVITY,
   PLAYER_HEIGHT,
   PLAYER_JUMP_VEL,
@@ -37,6 +39,8 @@ export function createEngine(config: EngineConfig): Engine {
       cam: 0,
       realT: 0,
       drops: [],
+      lives: MAX_LIVES,
+      iframeT: 0,
       status: "playing",
     };
   }
@@ -67,7 +71,22 @@ export function createEngine(config: EngineConfig): Engine {
     }
   }
 
+  function applyDamage() {
+    if (state.iframeT > 0) return;
+    state.lives--;
+    state.iframeT = IFRAME_DURATION;
+    if (state.lives <= 0) {
+      state.status = "dead";
+    }
+  }
+
   function step(dt: number) {
+    if (state.status !== "playing") return;
+
+    if (state.iframeT > 0) {
+      state.iframeT = Math.max(0, state.iframeT - dt);
+    }
+
     if (input.jump && !prevJump && state.jumpsLeft > 0) {
       state.vy = PLAYER_JUMP_VEL;
       state.onGround = false;
@@ -104,6 +123,18 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
 
+    if (state.onGround) {
+      for (const p of stage.puddles) {
+        if (
+          state.px + PLAYER_WIDTH / 2 > p.x &&
+          state.px - PLAYER_WIDTH / 2 < p.x + p.width
+        ) {
+          applyDamage();
+          break;
+        }
+      }
+    }
+
     const ts = getTimeScale();
 
     spawnAcc += dt * ts * stage.rainRate;
@@ -112,6 +143,11 @@ export function createEngine(config: EngineConfig): Engine {
       const spawnX = state.cam - 40 + Math.random() * (VIEWPORT_WIDTH + 160);
       state.drops.push({ x: spawnX, y: -40 });
     }
+
+    const playerLeft = state.px - PLAYER_WIDTH / 2;
+    const playerRight = state.px + PLAYER_WIDTH / 2;
+    const playerTopY = GROUND_Y - state.py - PLAYER_HEIGHT;
+    const playerBottomY = GROUND_Y - state.py;
 
     for (let i = state.drops.length - 1; i >= 0; i--) {
       const d = state.drops[i];
@@ -123,12 +159,25 @@ export function createEngine(config: EngineConfig): Engine {
         continue;
       }
 
+      let consumed = false;
       for (const s of stage.shelters) {
         const r = shelterRoof(s);
         if (d.y >= r.top && d.x >= r.left && d.x <= r.right) {
           state.drops.splice(i, 1);
+          consumed = true;
           break;
         }
+      }
+      if (consumed) continue;
+
+      if (
+        d.x >= playerLeft &&
+        d.x <= playerRight &&
+        d.y >= playerTopY &&
+        d.y <= playerBottomY
+      ) {
+        applyDamage();
+        state.drops.splice(i, 1);
       }
     }
 
@@ -212,22 +261,38 @@ export function createEngine(config: EngineConfig): Engine {
 
     const screenX = state.px - state.cam;
     const playerTop = GROUND_Y - state.py - PLAYER_HEIGHT;
-    ctx!.fillStyle = "#fff";
-    ctx!.fillRect(
-      screenX - PLAYER_WIDTH / 2,
-      playerTop,
-      PLAYER_WIDTH,
-      PLAYER_HEIGHT,
-    );
+    const blinking =
+      state.iframeT > 0 && Math.floor(state.realT * 12) % 2 === 0;
+    if (!blinking) {
+      ctx!.fillStyle = "#fff";
+      ctx!.fillRect(
+        screenX - PLAYER_WIDTH / 2,
+        playerTop,
+        PLAYER_WIDTH,
+        PLAYER_HEIGHT,
+      );
+    }
 
     ctx!.fillStyle = "#888";
     ctx!.font = "22px monospace";
     ctx!.fillText(`stage: ${stage.name}  ts: ${ts.toFixed(2)}`, 24, 44);
     ctx!.fillText(
-      `px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} vy:${state.vy.toFixed(0)} jumps:${state.jumpsLeft}`,
+      `lives:${state.lives}  px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} jumps:${state.jumpsLeft}`,
       24,
       72,
     );
+
+    if (state.status === "dead") {
+      ctx!.save();
+      ctx!.fillStyle = "rgba(0,0,0,0.6)";
+      ctx!.fillRect(0, 0, W, H);
+      ctx!.fillStyle = "#fff";
+      ctx!.font = "64px monospace";
+      ctx!.textAlign = "center";
+      ctx!.textBaseline = "middle";
+      ctx!.fillText("GAME OVER", W / 2, H / 2);
+      ctx!.restore();
+    }
   }
 
   function loop(now: number) {

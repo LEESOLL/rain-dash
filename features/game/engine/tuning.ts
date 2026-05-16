@@ -18,3 +18,6 @@ export const PLAYER_SCREEN_LIMIT_RATIO = 0.5;
 export const RAIN_VX = -90;
 export const RAIN_VY = 540;
 export const RAIN_STREAK_LENGTH = 30;
+
+export const MAX_LIVES = 3;
+export const IFRAME_DURATION = 1.0;

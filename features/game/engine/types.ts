@@ -39,6 +39,12 @@ export type GameState = {
   /** 현재 화면에 있는 빗방울들 */
   drops: Drop[];
 
+  /** 남은 라이프 — 0이 되면 status가 dead로 전환 */
+  lives: number;
+
+  /** 무적 잔여 시간 (초) — 피격 직후 짧게 지속 */
+  iframeT: number;
+
   /** 진행 / 승리 / 사망 */
   status: GameStatus;
 };
