@@ -9,9 +9,10 @@ import {
   PLAYER_SCREEN_LIMIT_RATIO,
   PLAYER_SPEED,
   PLAYER_WIDTH,
-  RAIN_STREAK_K,
+  RAIN_STREAK_LENGTH,
   RAIN_VX,
   RAIN_VY,
+  STILL_TIME_SCALE,
   VIEWPORT_WIDTH,
 } from "./tuning";
 
@@ -45,6 +46,10 @@ export function createEngine(config: EngineConfig): Engine {
   let lastT = 0;
   let prevJump = false;
   let spawnAcc = 0;
+
+  function getTimeScale(): number {
+    return input.left || input.right ? 1 : STILL_TIME_SCALE;
+  }
 
   function step(dt: number) {
     if (input.jump && !prevJump && state.jumpsLeft > 0) {
@@ -83,7 +88,9 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
 
-    spawnAcc += dt * stage.rainRate;
+    const ts = getTimeScale();
+
+    spawnAcc += dt * ts * stage.rainRate;
     while (spawnAcc >= 1) {
       spawnAcc -= 1;
       const spawnX = state.cam - 40 + Math.random() * (VIEWPORT_WIDTH + 160);
@@ -92,8 +99,8 @@ export function createEngine(config: EngineConfig): Engine {
 
     for (let i = state.drops.length - 1; i >= 0; i--) {
       const d = state.drops[i];
-      d.x += RAIN_VX * dt;
-      d.y += RAIN_VY * dt;
+      d.x += RAIN_VX * dt * ts;
+      d.y += RAIN_VY * dt * ts;
       if (d.y > GROUND_Y + 20) {
         state.drops.splice(i, 1);
       }
@@ -114,11 +121,14 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.fillStyle = "#5d4f3e";
     ctx!.fillRect(0, GROUND_Y, W, 3);
 
+    const ts = getTimeScale();
     const playerVxRaw =
       input.right && !input.left ? PLAYER_SPEED : 0;
     const appVx = RAIN_VX - playerVxRaw;
-    const sdx = appVx * RAIN_STREAK_K;
-    const sdy = RAIN_VY * RAIN_STREAK_K;
+    const appVy = RAIN_VY;
+    const mag = Math.sqrt(appVx * appVx + appVy * appVy);
+    const sdx = (appVx / mag) * RAIN_STREAK_LENGTH;
+    const sdy = (appVy / mag) * RAIN_STREAK_LENGTH;
     ctx!.strokeStyle = "rgba(190,210,245,0.78)";
     ctx!.lineWidth = 1.4;
     ctx!.beginPath();
@@ -142,7 +152,7 @@ export function createEngine(config: EngineConfig): Engine {
 
     ctx!.fillStyle = "#888";
     ctx!.font = "22px monospace";
-    ctx!.fillText(`stage: ${stage.name}`, 24, 44);
+    ctx!.fillText(`stage: ${stage.name}  ts: ${ts.toFixed(2)}`, 24, 44);
     ctx!.fillText(
       `px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} vy:${state.vy.toFixed(0)} jumps:${state.jumpsLeft}`,
       24,
