@@ -25,18 +25,23 @@ export function GameCanvas({ stage }: Props) {
     function onKeyDown(e: KeyboardEvent) {
       if (e.code === "ArrowLeft" || e.code === "KeyA") {
         engine.setInput({ left: true });
-      }
-      if (e.code === "ArrowRight" || e.code === "KeyD") {
+        e.preventDefault();
+      } else if (e.code === "ArrowRight" || e.code === "KeyD") {
         engine.setInput({ right: true });
+        e.preventDefault();
+      } else if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+        engine.setInput({ jump: true });
+        e.preventDefault();
       }
     }
 
     function onKeyUp(e: KeyboardEvent) {
       if (e.code === "ArrowLeft" || e.code === "KeyA") {
         engine.setInput({ left: false });
-      }
-      if (e.code === "ArrowRight" || e.code === "KeyD") {
+      } else if (e.code === "ArrowRight" || e.code === "KeyD") {
         engine.setInput({ right: false });
+      } else if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+        engine.setInput({ jump: false });
       }
     }
 

@@ -17,6 +17,8 @@ export type GameState = {
   vy: number;
   /** 지면 위에 있나 */
   onGround: boolean;
+  /** 남은 점프 횟수 — 착지 시 MAX_JUMPS로 리셋, 점프 시 -1 */
+  jumpsLeft: number;
   /** 바라보는 방향 (1 = 오른쪽, -1 = 왼쪽) */
   facing: 1 | -1;
 

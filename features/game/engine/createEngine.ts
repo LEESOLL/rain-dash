@@ -2,7 +2,10 @@ import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
   GROUND_Y,
+  MAX_JUMPS,
+  PLAYER_GRAVITY,
   PLAYER_HEIGHT,
+  PLAYER_JUMP_VEL,
   PLAYER_SCREEN_LIMIT_RATIO,
   PLAYER_SPEED,
   PLAYER_WIDTH,
@@ -24,6 +27,7 @@ export function createEngine(config: EngineConfig): Engine {
       py: 0,
       vy: 0,
       onGround: true,
+      jumpsLeft: MAX_JUMPS,
       facing: 1,
       cam: 0,
       realT: 0,
@@ -35,8 +39,27 @@ export function createEngine(config: EngineConfig): Engine {
 
   let raf: number | null = null;
   let lastT = 0;
+  let prevJump = false;
 
   function step(dt: number) {
+    if (input.jump && !prevJump && state.jumpsLeft > 0) {
+      state.vy = PLAYER_JUMP_VEL;
+      state.onGround = false;
+      state.jumpsLeft--;
+    }
+    prevJump = input.jump;
+
+    if (!state.onGround) {
+      state.vy -= PLAYER_GRAVITY * dt;
+      state.py += state.vy * dt;
+      if (state.py <= 0) {
+        state.py = 0;
+        state.vy = 0;
+        state.onGround = true;
+        state.jumpsLeft = MAX_JUMPS;
+      }
+    }
+
     let vx = 0;
     if (input.right && !input.left) {
       vx = PLAYER_SPEED;
@@ -84,7 +107,7 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.font = "22px monospace";
     ctx!.fillText(`stage: ${stage.name}`, 24, 44);
     ctx!.fillText(
-      `px: ${state.px.toFixed(0)}  cam: ${state.cam.toFixed(0)}`,
+      `px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} vy:${state.vy.toFixed(0)} jumps:${state.jumpsLeft}`,
       24,
       72,
     );

@@ -5,6 +5,7 @@ export const GROUND_Y = 576;
 export const PLAYER_SPEED = 230;
 export const PLAYER_GRAVITY = 1700;
 export const PLAYER_JUMP_VEL = 640;
+export const MAX_JUMPS = 2;
 
 export const PLAYER_WIDTH = 26;
 export const PLAYER_HEIGHT = 40;
