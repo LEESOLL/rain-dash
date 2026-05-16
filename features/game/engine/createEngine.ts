@@ -5,6 +5,7 @@ import {
   GROUND_Y,
   IFRAME_DURATION,
   LIGHTNING_LINGER_DURATION,
+  LIGHTNING_PLAYER_BIAS_RADIUS,
   LIGHTNING_SPAWN_MARGIN,
   LIGHTNING_STRIKE_DURATION,
   LIGHTNING_WARN_DURATION,
@@ -197,10 +198,19 @@ export function createEngine(config: EngineConfig): Engine {
       if (state.nextStrikeT <= 0) {
         const { min, max } = stage.lightning.gap;
         const warnSec = stage.lightning.warnSec ?? LIGHTNING_WARN_DURATION;
-        const spawnX =
-          state.cam +
-          LIGHTNING_SPAWN_MARGIN +
-          Math.random() * (VIEWPORT_WIDTH - 2 * LIGHTNING_SPAWN_MARGIN);
+        const playerEffVx =
+          input.right && !input.left
+            ? PLAYER_SPEED
+            : input.left && !input.right
+              ? -PLAYER_SPEED
+              : AUTO_SCROLL_SPEED;
+        const predictedX = state.px + playerEffVx * warnSec;
+        const desiredX =
+          predictedX +
+          (Math.random() - 0.5) * 2 * LIGHTNING_PLAYER_BIAS_RADIUS;
+        const minX = state.cam + LIGHTNING_SPAWN_MARGIN;
+        const maxX = state.cam + VIEWPORT_WIDTH - LIGHTNING_SPAWN_MARGIN;
+        const spawnX = Math.max(minX, Math.min(maxX, desiredX));
         state.lightnings.push({ x: spawnX, phase: "warn", t: warnSec });
         state.nextStrikeT = min + Math.random() * (max - min);
       }
