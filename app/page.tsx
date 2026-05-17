@@ -39,6 +39,12 @@ export default function Home() {
           >
             게임 방법
           </Link>
+          <Link
+            href="/ranking"
+            className="rounded border border-white/30 px-8 py-3 text-center text-lg tracking-widest transition hover:bg-white/10"
+          >
+            랭킹 보기
+          </Link>
         </div>
       </div>
     </main>

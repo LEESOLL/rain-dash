@@ -7,6 +7,7 @@ const DEFAULT_PROGRESS: StageProgress = {
   clearedStageIds: [],
   bestScores: {},
   attemptCounts: {},
+  cumulativeScore: 0,
 };
 
 export function getProgress(): StageProgress {
@@ -37,6 +38,20 @@ export function recordBestScore(stageId: string, score: number): StageProgress {
   const updated: StageProgress = {
     ...current,
     bestScores: { ...current.bestScores, [stageId]: score },
+  };
+  setData(KEY, updated);
+  return updated;
+}
+
+export function getCumulativeScore(): number {
+  return getProgress().cumulativeScore ?? 0;
+}
+
+export function addCumulativeScore(amount: number): StageProgress {
+  const current = getProgress();
+  const updated: StageProgress = {
+    ...current,
+    cumulativeScore: (current.cumulativeScore ?? 0) + amount,
   };
   setData(KEY, updated);
   return updated;

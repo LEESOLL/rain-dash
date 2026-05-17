@@ -60,4 +60,5 @@ export type StageProgress = {
   clearedStageIds: string[];
   bestScores: { [stageId: string]: number };
   attemptCounts: { [stageId: string]: number };
+  cumulativeScore: number;
 };

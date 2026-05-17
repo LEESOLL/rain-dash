@@ -1,5 +1,6 @@
 import type { Item, Shelter } from "@/features/stage/types";
 import {
+  addCumulativeScore,
   getBestScore,
   markCleared,
   recordBestScore,
@@ -233,6 +234,7 @@ export function createEngine(config: EngineConfig): Engine {
       state.bestScore = Math.max(prevBest, total);
       recordBestScore(stage.id, total);
       markCleared(stage.id);
+      addCumulativeScore(total);
     }
 
     if (state.onGround) {

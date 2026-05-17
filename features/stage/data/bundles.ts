@@ -42,5 +42,10 @@ export const BUNDLES: Bundle[] = [
     status: "coming-soon",
   },
   { id: "future-city", name: "미래 도시", stageIds: [], status: "coming-soon" },
-  { id: "space", name: "우주", stageIds: [], status: "coming-soon" },
+  {
+    id: "space-station",
+    name: "우주 정거장",
+    stageIds: [],
+    status: "coming-soon",
+  },
 ];
