@@ -1,18 +1,26 @@
-import Link from "next/link";
+"use client";
 
-export default function HowToPlayPage() {
+import { Modal } from "@/components/Modal";
+
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export function HowToPlayModal({ isOpen, onClose }: Props) {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-black text-white font-mono">
-      <div className="flex w-full max-w-xl flex-col items-center gap-10 px-8">
-        <h1 className="text-4xl font-bold tracking-widest">게임 방법</h1>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="flex flex-col gap-6">
+        <h2 className="text-center text-xl font-bold tracking-widest">
+          게임 방법
+        </h2>
 
-        <div className="w-full space-y-3 text-sm leading-relaxed opacity-80">
+        <div className="space-y-3 text-sm leading-relaxed opacity-90">
           <p>
             <span className="opacity-50">←/A, →/D</span> — 좌우 이동
           </p>
           <p>
-            <span className="opacity-50">SPACE, ↑, W</span> — 점프 (2단 점프
-            가능)
+            <span className="opacity-50">SPACE, ↑, W</span> — 점프 (2단 점프 가능)
           </p>
           <p>
             <span className="opacity-50">R</span> — 사망/승리 후 재시작
@@ -21,7 +29,7 @@ export default function HowToPlayPage() {
             <span className="opacity-50">ESC</span> — 메인으로
           </p>
 
-          <p className="!mt-6">
+          <p className="!mt-5">
             가만히 있으면 시간이 느려집니다. 움직이면 빨라집니다.
           </p>
           <p>비를 피하거나 쉘터 아래로 들어가 안전 위치를 잡으세요.</p>
@@ -31,13 +39,15 @@ export default function HowToPlayPage() {
           <p>골인 지점의 깃발까지 도착하면 클리어입니다.</p>
         </div>
 
-        <Link
-          href="/"
-          className="rounded border border-white/30 px-6 py-2 text-sm transition hover:bg-white/10"
-        >
-          ← 메인으로
-        </Link>
+        <div className="flex justify-center">
+          <button
+            onClick={onClose}
+            className="rounded border border-white/30 px-6 py-2 text-sm transition hover:bg-white/10"
+          >
+            닫기
+          </button>
+        </div>
       </div>
-    </main>
+    </Modal>
   );
 }
