@@ -1,4 +1,9 @@
 import type { Item, Shelter } from "@/features/stage/types";
+import {
+  getBestScore,
+  markCleared,
+  recordBestScore,
+} from "@/features/stage/stageProgressRepository";
 import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
@@ -70,6 +75,10 @@ export function createEngine(config: EngineConfig): Engine {
       raincoatT: 0,
       score: 0,
       scorePopups: [],
+      bestScore: getBestScore(stage.id),
+      isNewBest: false,
+      timeBonus: 0,
+      heartBonus: 0,
       status: "playing",
     };
   }
@@ -211,6 +220,19 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px >= stage.goalDistance) {
       state.status = "won";
       if (winStartT === null) winStartT = performance.now();
+
+      const refTime = stage.goalDistance / AUTO_SCROLL_SPEED;
+      const timeSaved = Math.max(0, refTime - state.realT);
+      state.timeBonus = Math.floor(timeSaved * TIME_BONUS_PER_SEC);
+      state.heartBonus = state.lives * HEART_BONUS;
+      const total =
+        Math.floor(state.score) + state.timeBonus + state.heartBonus;
+
+      const prevBest = getBestScore(stage.id);
+      state.isNewBest = total > prevBest;
+      state.bestScore = Math.max(prevBest, total);
+      recordBestScore(stage.id, total);
+      markCleared(stage.id);
     }
 
     if (state.onGround) {
@@ -557,6 +579,15 @@ export function createEngine(config: EngineConfig): Engine {
       W - 24,
       48,
     );
+    if (state.bestScore > 0) {
+      ctx!.font = "18px monospace";
+      ctx!.fillStyle = "rgba(255,255,255,0.5)";
+      ctx!.fillText(
+        `BEST ${state.bestScore.toLocaleString()}`,
+        W - 24,
+        76,
+      );
+    }
     ctx!.restore();
 
     ctx!.fillStyle = "#888";
@@ -595,9 +626,7 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.status === "won") {
       const animSec =
         winStartT === null ? 0 : (performance.now() - winStartT) / 1000;
-      const refTime = stage.goalDistance / AUTO_SCROLL_SPEED;
-      const timeSaved = Math.max(0, refTime - state.realT);
-      const fullTimeBonus = Math.floor(timeSaved * TIME_BONUS_PER_SEC);
+      const fullTimeBonus = state.timeBonus;
 
       const TIME_START = 0.4;
       const TIME_DURATION = 1.0;
@@ -690,6 +719,24 @@ export function createEngine(config: EngineConfig): Engine {
         ctx!.fillText("TOTAL", labelX, startY + lineH * 3.5);
         ctx!.textAlign = "right";
         ctx!.fillText(total.toLocaleString(), valueX, startY + lineH * 3.5);
+
+        ctx!.font = "20px monospace";
+        ctx!.fillStyle = state.isNewBest ? "#ffe066" : "rgba(255,255,255,0.7)";
+        ctx!.textAlign = "left";
+        ctx!.fillText("BEST", labelX, startY + lineH * 4.5);
+        ctx!.textAlign = "right";
+        ctx!.fillText(
+          state.bestScore.toLocaleString(),
+          valueX,
+          startY + lineH * 4.5,
+        );
+
+        if (state.isNewBest) {
+          ctx!.fillStyle = "#ffe066";
+          ctx!.font = "bold 26px monospace";
+          ctx!.textAlign = "center";
+          ctx!.fillText("★ NEW BEST! ★", W / 2, startY + lineH * 5.6);
+        }
       }
 
       ctx!.font = "22px monospace";

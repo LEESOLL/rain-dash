@@ -25,6 +25,10 @@ export function markCleared(stageId: string): StageProgress {
   return updated;
 }
 
+export function getBestScore(stageId: string): number {
+  return getProgress().bestScores[stageId] ?? 0;
+}
+
 export function recordBestScore(stageId: string, score: number): StageProgress {
   const current = getProgress();
   const prevBest = current.bestScores[stageId] ?? 0;

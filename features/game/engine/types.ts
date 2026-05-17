@@ -74,6 +74,18 @@ export type GameState = {
   /** 진행 중인 점수 팝업 (아이템 픽업 시 +N 떠오름) */
   scorePopups: ScorePopup[];
 
+  /** 이 스테이지의 베스트 점수 (게임 시작 시 로드, won 시점에 갱신) */
+  bestScore: number;
+
+  /** 이번 클리어가 새 베스트인지 (won 시점에 결정) */
+  isNewBest: boolean;
+
+  /** 시간 보너스 (won 시점에 확정 — draw 재계산 방지) */
+  timeBonus: number;
+
+  /** 하트 보너스 (won 시점에 확정 — draw 재계산 방지) */
+  heartBonus: number;
+
   /** 남은 라이프 — 0이 되면 status가 dead로 전환 */
   lives: number;
 
