@@ -20,7 +20,8 @@ export function createUser(nickname?: string): UserProfile {
   const cleaned = nickname?.trim();
   const profile: UserProfile = {
     userId: generateId(),
-    nickname: cleaned && cleaned.length > 0 ? cleaned : generateDefaultNickname(),
+    nickname:
+      cleaned && cleaned.length > 0 ? cleaned : generateDefaultNickname(),
     createdAt: Date.now(),
   };
   setData(KEY, profile);
@@ -31,7 +32,8 @@ export function changeNickname(nickname: string): UserProfile {
   const trimmed = nickname.trim();
   const existing = getUser();
   if (!existing) return createUser(trimmed);
-  const updated = { ...existing, nickname: trimmed };
+  const next = trimmed.length > 0 ? trimmed : generateDefaultNickname();
+  const updated = { ...existing, nickname: next };
   setData(KEY, updated);
   return updated;
 }
