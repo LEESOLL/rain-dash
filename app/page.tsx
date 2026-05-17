@@ -17,7 +17,7 @@ export default function Home() {
   function handleStart() {
     const user = readCachedUser();
     if (user) {
-      router.push("/play/rainy-day-01");
+      router.push("/play");
     } else {
       setNicknameOpen(true);
     }
@@ -25,7 +25,7 @@ export default function Home() {
 
   function handleNicknameConfirmed() {
     setNicknameOpen(false);
-    router.push("/play/rainy-day-01");
+    router.push("/play");
   }
 
   return (

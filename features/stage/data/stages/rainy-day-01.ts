@@ -45,6 +45,6 @@ export const rainyDay01: Stage = {
     { x: 8300, y: 0, type: "heart" },
     { x: 9200, y: 60, type: "boots" },
   ],
-  rainRate: 8,
-  lightning: { gap: { min: 4, max: 8 }, warnSec: 1.2 },
+  rainRate: 6,
+  lightning: { gap: { min: 5, max: 9 }, warnSec: 1.2 },
 };

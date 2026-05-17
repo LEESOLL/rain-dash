@@ -4,7 +4,7 @@ export const BUNDLES: Bundle[] = [
   {
     id: "rainy-day",
     name: "비 오는 낮 거리",
-    stageIds: ["rainy-day-01"],
+    stageIds: ["rainy-day-01", "rainy-day-02", "rainy-day-03"],
     status: "available",
     theme: {
       backgroundImage: "/sprites/rainy-day/bg.png",

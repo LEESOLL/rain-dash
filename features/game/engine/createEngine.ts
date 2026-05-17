@@ -620,8 +620,6 @@ export function createEngine(config: EngineConfig): Engine {
       ctx!.textAlign = "center";
       ctx!.textBaseline = "middle";
       ctx!.fillText("GAME OVER", W / 2, H / 2 - 20);
-      ctx!.font = "22px monospace";
-      ctx!.fillText("press R to restart", W / 2, H / 2 + 40);
       ctx!.restore();
     }
 
@@ -740,11 +738,6 @@ export function createEngine(config: EngineConfig): Engine {
           ctx!.fillText("★ NEW BEST! ★", W / 2, startY + lineH * 5.6);
         }
       }
-
-      ctx!.font = "22px monospace";
-      ctx!.fillStyle = "rgba(255,255,255,0.7)";
-      ctx!.textAlign = "center";
-      ctx!.fillText("press R to restart", W / 2, H * 0.88);
 
       ctx!.restore();
     }
