@@ -32,6 +32,12 @@ export function GameCanvas({ stage }: Props) {
       } else if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
         engine.setInput({ jump: true });
         e.preventDefault();
+      } else if (e.code === "KeyR") {
+        const s = engine.getState();
+        if (s.status === "dead" || s.status === "won") {
+          engine.restart();
+        }
+        e.preventDefault();
       }
     }
 

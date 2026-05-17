@@ -176,6 +176,10 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
 
+    if (state.px >= stage.goalDistance) {
+      state.status = "won";
+    }
+
     if (state.onGround) {
       for (const p of stage.puddles) {
         if (
@@ -322,6 +326,23 @@ export function createEngine(config: EngineConfig): Engine {
       ctx!.fillRect(sx, GROUND_Y - 3, p.width, 8);
       ctx!.fillStyle = "rgba(180,210,255,0.4)";
       ctx!.fillRect(sx, GROUND_Y - 3, p.width, 2);
+    }
+
+    {
+      const sx = stage.goalDistance - state.cam;
+      if (sx > -40 && sx < W + 40) {
+        ctx!.fillStyle = "#5d4f3e";
+        ctx!.fillRect(sx - 2, GROUND_Y - 90, 4, 90);
+        ctx!.fillStyle = "#e53e3e";
+        ctx!.beginPath();
+        ctx!.moveTo(sx + 2, GROUND_Y - 90);
+        ctx!.lineTo(sx + 32, GROUND_Y - 80);
+        ctx!.lineTo(sx + 2, GROUND_Y - 65);
+        ctx!.closePath();
+        ctx!.fill();
+        ctx!.fillStyle = "#fbb6ce";
+        ctx!.fillRect(sx + 2, GROUND_Y - 90, 24, 2);
+      }
     }
 
     for (const it of state.items) {
@@ -477,7 +498,7 @@ export function createEngine(config: EngineConfig): Engine {
     ctx!.font = "22px monospace";
     ctx!.fillText(`stage: ${stage.name}  ts: ${ts.toFixed(2)}`, 24, 44);
     ctx!.fillText(
-      `lives:${state.lives}  px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} jumps:${state.jumpsLeft}`,
+      `lives:${state.lives}  dist:${state.px.toFixed(0)}/${stage.goalDistance}  jumps:${state.jumpsLeft}`,
       24,
       72,
     );
@@ -497,15 +518,18 @@ export function createEngine(config: EngineConfig): Engine {
       100,
     );
 
-    if (state.status === "dead") {
+    if (state.status === "dead" || state.status === "won") {
       ctx!.save();
-      ctx!.fillStyle = "rgba(0,0,0,0.6)";
+      const isWin = state.status === "won";
+      ctx!.fillStyle = isWin ? "rgba(20,80,30,0.7)" : "rgba(0,0,0,0.6)";
       ctx!.fillRect(0, 0, W, H);
       ctx!.fillStyle = "#fff";
       ctx!.font = "64px monospace";
       ctx!.textAlign = "center";
       ctx!.textBaseline = "middle";
-      ctx!.fillText("GAME OVER", W / 2, H / 2);
+      ctx!.fillText(isWin ? "STAGE CLEAR" : "GAME OVER", W / 2, H / 2 - 20);
+      ctx!.font = "22px monospace";
+      ctx!.fillText("press R to restart", W / 2, H / 2 + 40);
       ctx!.restore();
     }
   }
@@ -539,6 +563,11 @@ export function createEngine(config: EngineConfig): Engine {
     },
     getState() {
       return state;
+    },
+    restart() {
+      Object.assign(state, initialState());
+      spawnAcc = 0;
+      prevJump = false;
     },
   };
 }
