@@ -2,10 +2,12 @@ import type { Item, Shelter } from "@/features/stage/types";
 import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
+  DISTANCE_SCORE_RATE,
   GROUND_Y,
   IFRAME_DURATION,
   ITEM_BLINK_THRESHOLD,
   ITEM_DURATION,
+  ITEM_SCORE,
   ITEM_SIZE,
   LIGHTNING_LINGER_DURATION,
   LIGHTNING_PLAYER_BIAS_RADIUS,
@@ -24,6 +26,8 @@ import {
   RAIN_STREAK_LENGTH,
   RAIN_VX,
   RAIN_VY,
+  SCORE_POPUP_DURATION,
+  SCORE_POPUP_RISE,
   STILL_TIME_SCALE,
   VIEWPORT_WIDTH,
 } from "./tuning";
@@ -60,6 +64,8 @@ export function createEngine(config: EngineConfig): Engine {
       umbrellaT: 0,
       bootsT: 0,
       raincoatT: 0,
+      score: 0,
+      scorePopups: [],
       status: "playing",
     };
   }
@@ -70,6 +76,7 @@ export function createEngine(config: EngineConfig): Engine {
   let lastT = 0;
   let prevJump = false;
   let spawnAcc = 0;
+  let prevPxScore = state.px;
 
   function getTimeScale(): number {
     return input.left || input.right ? 1 : STILL_TIME_SCALE;
@@ -100,6 +107,14 @@ export function createEngine(config: EngineConfig): Engine {
   }
 
   function pickupItem(it: Item) {
+    const points = ITEM_SCORE[it.type];
+    state.score += points;
+    state.scorePopups.push({
+      x: it.x,
+      y: GROUND_Y - it.y - ITEM_SIZE,
+      value: points,
+      t: SCORE_POPUP_DURATION,
+    });
     switch (it.type) {
       case "heart":
         state.lives = Math.min(MAX_LIVES, state.lives + 1);
@@ -175,6 +190,10 @@ export function createEngine(config: EngineConfig): Engine {
 
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
+
+    const dxScore = state.px - prevPxScore;
+    if (dxScore > 0) state.score += dxScore * DISTANCE_SCORE_RATE;
+    prevPxScore = state.px;
 
     if (state.px >= stage.goalDistance) {
       state.status = "won";
@@ -268,8 +287,7 @@ export function createEngine(config: EngineConfig): Engine {
               : AUTO_SCROLL_SPEED;
         const predictedX = state.px + playerEffVx * warnSec;
         const desiredX =
-          predictedX +
-          (Math.random() - 0.5) * 2 * LIGHTNING_PLAYER_BIAS_RADIUS;
+          predictedX + (Math.random() - 0.5) * 2 * LIGHTNING_PLAYER_BIAS_RADIUS;
         const minX = state.cam + LIGHTNING_SPAWN_MARGIN;
         const maxX = state.cam + VIEWPORT_WIDTH - LIGHTNING_SPAWN_MARGIN;
         const spawnX = Math.max(minX, Math.min(maxX, desiredX));
@@ -302,6 +320,12 @@ export function createEngine(config: EngineConfig): Engine {
           applyDamage();
         }
       }
+    }
+
+    for (let i = state.scorePopups.length - 1; i >= 0; i--) {
+      const p = state.scorePopups[i];
+      p.t -= dt;
+      if (p.t <= 0) state.scorePopups.splice(i, 1);
     }
 
     state.realT += dt;
@@ -494,6 +518,33 @@ export function createEngine(config: EngineConfig): Engine {
       );
     }
 
+    for (const p of state.scorePopups) {
+      const sx = p.x - state.cam;
+      if (sx < -60 || sx > W + 60) continue;
+      const progress = 1 - p.t / SCORE_POPUP_DURATION;
+      const yOffset = -progress * SCORE_POPUP_RISE;
+      const alpha = Math.max(0, 1 - progress);
+
+      ctx!.save();
+      ctx!.globalAlpha = alpha;
+      ctx!.fillStyle = "#ffe066";
+      ctx!.font = "bold 20px monospace";
+      ctx!.textAlign = "center";
+      ctx!.fillText(`+${p.value}`, sx, p.y + yOffset);
+      ctx!.restore();
+    }
+
+    ctx!.save();
+    ctx!.fillStyle = "#fff";
+    ctx!.font = "32px monospace";
+    ctx!.textAlign = "right";
+    ctx!.fillText(
+      `SCORE ${Math.floor(state.score).toLocaleString()}`,
+      W - 24,
+      48,
+    );
+    ctx!.restore();
+
     ctx!.fillStyle = "#888";
     ctx!.font = "22px monospace";
     ctx!.fillText(`stage: ${stage.name}  ts: ${ts.toFixed(2)}`, 24, 44);
@@ -508,15 +559,10 @@ export function createEngine(config: EngineConfig): Engine {
     const held: string[] = [];
     if (showItem(state.umbrellaT))
       held.push(`우산(${state.umbrellaT.toFixed(1)})`);
-    if (showItem(state.bootsT))
-      held.push(`장화(${state.bootsT.toFixed(1)})`);
+    if (showItem(state.bootsT)) held.push(`장화(${state.bootsT.toFixed(1)})`);
     if (showItem(state.raincoatT))
       held.push(`우비(${state.raincoatT.toFixed(1)})`);
-    ctx!.fillText(
-      `hold: ${held.length ? held.join(" ") : "-"}`,
-      24,
-      100,
-    );
+    ctx!.fillText(`hold: ${held.length ? held.join(" ") : "-"}`, 24, 100);
 
     if (state.status === "dead" || state.status === "won") {
       ctx!.save();
@@ -568,6 +614,7 @@ export function createEngine(config: EngineConfig): Engine {
       Object.assign(state, initialState());
       spawnAcc = 0;
       prevJump = false;
+      prevPxScore = state.px;
     },
   };
 }

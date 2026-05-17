@@ -16,6 +16,18 @@ export type Drop = {
   y: number;
 };
 
+/** 아이템 픽업 시 위로 떠오르는 점수 텍스트 */
+export type ScorePopup = {
+  /** 월드 X (spawn 시점의 아이템 중심) */
+  x: number;
+  /** 캔버스 Y (spawn 시점의 시작 높이) */
+  y: number;
+  /** 표시할 점수 (양수) */
+  value: number;
+  /** 남은 lifetime (실시간 초) */
+  t: number;
+};
+
 export type LightningPhase = "warn" | "strike" | "linger";
 
 /** 번개 이벤트 — warn → strike → linger 순으로 진행 */
@@ -55,6 +67,12 @@ export type GameState = {
 
   /** 다음 번개 스폰까지 남은 시간 (실시간 초) — stage.lightning이 null이면 사용 안 함 */
   nextStrikeT: number;
+
+  /** 누적 점수 — 거리 + 아이템 픽업으로 게임 중 실시간 증가 */
+  score: number;
+
+  /** 진행 중인 점수 팝업 (아이템 픽업 시 +N 떠오름) */
+  scorePopups: ScorePopup[];
 
   /** 남은 라이프 — 0이 되면 status가 dead로 전환 */
   lives: number;

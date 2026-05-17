@@ -32,3 +32,19 @@ export const LIGHTNING_PLAYER_BIAS_RADIUS = 280;
 export const ITEM_SIZE = 22;
 export const ITEM_DURATION = 3;
 export const ITEM_BLINK_THRESHOLD = 1;
+
+export const ITEM_SCORE: Record<
+  "heart" | "umbrella" | "boots" | "raincoat",
+  number
+> = {
+  heart: 200,
+  umbrella: 100,
+  boots: 100,
+  raincoat: 150,
+};
+
+export const SCORE_POPUP_DURATION = 1.0;
+export const SCORE_POPUP_RISE = 40;
+
+/** 거리 1px당 누적되는 점수. 낮출수록 점수 증가 속도 느려짐 */
+export const DISTANCE_SCORE_RATE = 0.5;
