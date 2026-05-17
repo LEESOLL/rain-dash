@@ -4,6 +4,7 @@ import {
   AUTO_SCROLL_SPEED,
   DISTANCE_SCORE_RATE,
   GROUND_Y,
+  HEART_BONUS,
   IFRAME_DURATION,
   ITEM_BLINK_THRESHOLD,
   ITEM_DURATION,
@@ -31,6 +32,7 @@ import {
   SPEED_MULT_MAX,
   SPEED_MULT_MIN,
   STILL_TIME_SCALE,
+  TIME_BONUS_PER_SEC,
   VIEWPORT_WIDTH,
 } from "./tuning";
 
@@ -79,6 +81,7 @@ export function createEngine(config: EngineConfig): Engine {
   let prevJump = false;
   let spawnAcc = 0;
   let prevPxScore = state.px;
+  let winStartT: number | null = null;
 
   function getTimeScale(): number {
     return input.left || input.right ? 1 : STILL_TIME_SCALE;
@@ -207,6 +210,7 @@ export function createEngine(config: EngineConfig): Engine {
 
     if (state.px >= stage.goalDistance) {
       state.status = "won";
+      if (winStartT === null) winStartT = performance.now();
     }
 
     if (state.onGround) {
@@ -574,18 +578,125 @@ export function createEngine(config: EngineConfig): Engine {
       held.push(`우비(${state.raincoatT.toFixed(1)})`);
     ctx!.fillText(`hold: ${held.length ? held.join(" ") : "-"}`, 24, 100);
 
-    if (state.status === "dead" || state.status === "won") {
+    if (state.status === "dead") {
       ctx!.save();
-      const isWin = state.status === "won";
-      ctx!.fillStyle = isWin ? "rgba(20,80,30,0.7)" : "rgba(0,0,0,0.6)";
+      ctx!.fillStyle = "rgba(0,0,0,0.6)";
       ctx!.fillRect(0, 0, W, H);
       ctx!.fillStyle = "#fff";
       ctx!.font = "64px monospace";
       ctx!.textAlign = "center";
       ctx!.textBaseline = "middle";
-      ctx!.fillText(isWin ? "STAGE CLEAR" : "GAME OVER", W / 2, H / 2 - 20);
+      ctx!.fillText("GAME OVER", W / 2, H / 2 - 20);
       ctx!.font = "22px monospace";
       ctx!.fillText("press R to restart", W / 2, H / 2 + 40);
+      ctx!.restore();
+    }
+
+    if (state.status === "won") {
+      const animSec =
+        winStartT === null ? 0 : (performance.now() - winStartT) / 1000;
+      const refTime = stage.goalDistance / AUTO_SCROLL_SPEED;
+      const timeSaved = Math.max(0, refTime - state.realT);
+      const fullTimeBonus = Math.floor(timeSaved * TIME_BONUS_PER_SEC);
+
+      const TIME_START = 0.4;
+      const TIME_DURATION = 1.0;
+      const HEART_START = 1.7;
+      const HEART_INTERVAL = 0.3;
+      const TOTAL_DELAY = 0.5;
+
+      const timeT = Math.max(
+        0,
+        Math.min(1, (animSec - TIME_START) / TIME_DURATION),
+      );
+      const shownTimeBonus = Math.floor(fullTimeBonus * timeT);
+
+      const heartsConsumed = Math.max(
+        0,
+        Math.min(
+          state.lives,
+          Math.floor((animSec - HEART_START) / HEART_INTERVAL),
+        ),
+      );
+      const shownHeartBonus = heartsConsumed * HEART_BONUS;
+
+      const baseScore = Math.floor(state.score);
+      const heartsDoneAt = HEART_START + state.lives * HEART_INTERVAL;
+      const totalShown = animSec >= heartsDoneAt + TOTAL_DELAY;
+      const total = baseScore + shownTimeBonus + shownHeartBonus;
+
+      ctx!.save();
+      ctx!.fillStyle = "rgba(20,80,30,0.75)";
+      ctx!.fillRect(0, 0, W, H);
+
+      ctx!.fillStyle = "#fff";
+      ctx!.font = "56px monospace";
+      ctx!.textAlign = "center";
+      ctx!.textBaseline = "middle";
+      ctx!.fillText("STAGE CLEAR", W / 2, H * 0.2);
+
+      const cx = W / 2;
+      const labelX = cx - 220;
+      const valueX = cx + 220;
+      const startY = H * 0.42;
+      const lineH = 42;
+
+      ctx!.font = "24px monospace";
+
+      ctx!.fillStyle = "#fff";
+      ctx!.textAlign = "left";
+      ctx!.fillText("SCORE", labelX, startY);
+      ctx!.textAlign = "right";
+      ctx!.fillText(baseScore.toLocaleString(), valueX, startY);
+
+      if (animSec >= TIME_START) {
+        ctx!.fillStyle = "#ffe066";
+        ctx!.textAlign = "left";
+        ctx!.fillText("TIME bonus", labelX, startY + lineH);
+        ctx!.textAlign = "right";
+        ctx!.fillText(
+          `+${shownTimeBonus.toLocaleString()}`,
+          valueX,
+          startY + lineH,
+        );
+      }
+
+      if (animSec >= HEART_START) {
+        const heartsLeft = state.lives - heartsConsumed;
+        ctx!.fillStyle = "#fc8181";
+        ctx!.textAlign = "left";
+        ctx!.fillText("HEART bonus", labelX, startY + lineH * 2);
+        ctx!.textAlign = "center";
+        ctx!.fillText("♥".repeat(heartsLeft), cx, startY + lineH * 2);
+        ctx!.textAlign = "right";
+        ctx!.fillText(
+          `+${shownHeartBonus.toLocaleString()}`,
+          valueX,
+          startY + lineH * 2,
+        );
+      }
+
+      if (totalShown) {
+        ctx!.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx!.lineWidth = 1;
+        ctx!.beginPath();
+        ctx!.moveTo(labelX, startY + lineH * 2.8);
+        ctx!.lineTo(valueX, startY + lineH * 2.8);
+        ctx!.stroke();
+
+        ctx!.fillStyle = "#fff";
+        ctx!.font = "28px monospace";
+        ctx!.textAlign = "left";
+        ctx!.fillText("TOTAL", labelX, startY + lineH * 3.5);
+        ctx!.textAlign = "right";
+        ctx!.fillText(total.toLocaleString(), valueX, startY + lineH * 3.5);
+      }
+
+      ctx!.font = "22px monospace";
+      ctx!.fillStyle = "rgba(255,255,255,0.7)";
+      ctx!.textAlign = "center";
+      ctx!.fillText("press R to restart", W / 2, H * 0.88);
+
       ctx!.restore();
     }
   }
@@ -625,6 +736,7 @@ export function createEngine(config: EngineConfig): Engine {
       spawnAcc = 0;
       prevJump = false;
       prevPxScore = state.px;
+      winStartT = null;
     },
   };
 }

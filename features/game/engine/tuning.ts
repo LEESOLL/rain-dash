@@ -52,3 +52,9 @@ export const DISTANCE_SCORE_RATE = 0.5;
 /** 시간 스케일(ts)에 따른 거리 점수 배수 — ts가 STILL일 때 MIN, 1.0일 때 MAX */
 export const SPEED_MULT_MIN = 1.0;
 export const SPEED_MULT_MAX = 5.0;
+
+/** 엔드 보너스 — 빨리 깬 1초당 점수 (멈춤만 했을 때 시간 대비 단축 시간) */
+export const TIME_BONUS_PER_SEC = 30;
+
+/** 엔드 보너스 — 남은 하트 1개당 점수 */
+export const HEART_BONUS = 500;
