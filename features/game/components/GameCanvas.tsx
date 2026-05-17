@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
@@ -11,6 +12,7 @@ type Props = {
 
 export function GameCanvas({ stage }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,6 +40,9 @@ export function GameCanvas({ stage }: Props) {
           engine.restart();
         }
         e.preventDefault();
+      } else if (e.code === "Escape") {
+        router.push("/");
+        e.preventDefault();
       }
     }
 
@@ -59,7 +64,7 @@ export function GameCanvas({ stage }: Props) {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [stage]);
+  }, [stage, router]);
 
   return <canvas ref={canvasRef} className="block w-full h-full" />;
 }
