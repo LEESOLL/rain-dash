@@ -28,3 +28,7 @@ export const LIGHTNING_STRIKE_DURATION = 0.15;
 export const LIGHTNING_LINGER_DURATION = 0.5;
 export const LIGHTNING_SPAWN_MARGIN = 100;
 export const LIGHTNING_PLAYER_BIAS_RADIUS = 280;
+
+export const ITEM_SIZE = 22;
+export const ITEM_DURATION = 3;
+export const ITEM_BLINK_THRESHOLD = 1;

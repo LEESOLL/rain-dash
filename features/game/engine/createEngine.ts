@@ -1,9 +1,12 @@
-import type { Shelter } from "@/features/stage/types";
+import type { Item, Shelter } from "@/features/stage/types";
 import type { Engine, EngineConfig, GameState, Input } from "./types";
 import {
   AUTO_SCROLL_SPEED,
   GROUND_Y,
   IFRAME_DURATION,
+  ITEM_BLINK_THRESHOLD,
+  ITEM_DURATION,
+  ITEM_SIZE,
   LIGHTNING_LINGER_DURATION,
   LIGHTNING_PLAYER_BIAS_RADIUS,
   LIGHTNING_SPAWN_MARGIN,
@@ -53,6 +56,10 @@ export function createEngine(config: EngineConfig): Engine {
       nextStrikeT: initNext,
       lives: MAX_LIVES,
       iframeT: 0,
+      items: stage.items.map((it) => ({ ...it })),
+      umbrellaT: 0,
+      bootsT: 0,
+      raincoatT: 0,
       status: "playing",
     };
   }
@@ -92,11 +99,45 @@ export function createEngine(config: EngineConfig): Engine {
     }
   }
 
+  function pickupItem(it: Item) {
+    switch (it.type) {
+      case "heart":
+        state.lives = Math.min(MAX_LIVES, state.lives + 1);
+        break;
+      case "umbrella":
+        state.umbrellaT = ITEM_DURATION;
+        break;
+      case "boots":
+        state.bootsT = ITEM_DURATION;
+        break;
+      case "raincoat":
+        state.raincoatT = ITEM_DURATION;
+        break;
+    }
+  }
+
+  function absorbRain(): boolean {
+    return state.umbrellaT > 0 || state.raincoatT > 0;
+  }
+
+  function absorbPuddle(): boolean {
+    return state.bootsT > 0 || state.raincoatT > 0;
+  }
+
   function step(dt: number) {
     if (state.status !== "playing") return;
 
     if (state.iframeT > 0) {
       state.iframeT = Math.max(0, state.iframeT - dt);
+    }
+    if (state.umbrellaT > 0) {
+      state.umbrellaT = Math.max(0, state.umbrellaT - dt);
+    }
+    if (state.bootsT > 0) {
+      state.bootsT = Math.max(0, state.bootsT - dt);
+    }
+    if (state.raincoatT > 0) {
+      state.raincoatT = Math.max(0, state.raincoatT - dt);
     }
 
     if (input.jump && !prevJump && state.jumpsLeft > 0) {
@@ -141,9 +182,26 @@ export function createEngine(config: EngineConfig): Engine {
           state.px + PLAYER_WIDTH / 2 > p.x &&
           state.px - PLAYER_WIDTH / 2 < p.x + p.width
         ) {
-          applyDamage();
+          if (!absorbPuddle()) applyDamage();
           break;
         }
+      }
+    }
+
+    for (let i = state.items.length - 1; i >= 0; i--) {
+      const it = state.items[i];
+      const itLeft = it.x - ITEM_SIZE / 2;
+      const itRight = it.x + ITEM_SIZE / 2;
+      const itBottomY = GROUND_Y - it.y;
+      const itTopY = itBottomY - ITEM_SIZE;
+      if (
+        state.px + PLAYER_WIDTH / 2 > itLeft &&
+        state.px - PLAYER_WIDTH / 2 < itRight &&
+        GROUND_Y - state.py > itTopY &&
+        GROUND_Y - state.py - PLAYER_HEIGHT < itBottomY
+      ) {
+        pickupItem(it);
+        state.items.splice(i, 1);
       }
     }
 
@@ -188,7 +246,7 @@ export function createEngine(config: EngineConfig): Engine {
         d.y >= playerTopY &&
         d.y <= playerBottomY
       ) {
-        applyDamage();
+        if (!absorbRain()) applyDamage();
         state.drops.splice(i, 1);
       }
     }
@@ -264,6 +322,44 @@ export function createEngine(config: EngineConfig): Engine {
       ctx!.fillRect(sx, GROUND_Y - 3, p.width, 8);
       ctx!.fillStyle = "rgba(180,210,255,0.4)";
       ctx!.fillRect(sx, GROUND_Y - 3, p.width, 2);
+    }
+
+    for (const it of state.items) {
+      const sx = it.x - state.cam;
+      if (sx + ITEM_SIZE < 0 || sx - ITEM_SIZE > W) continue;
+      const yBottom = GROUND_Y - it.y;
+      const yTop = yBottom - ITEM_SIZE;
+      const left = sx - ITEM_SIZE / 2;
+
+      if (it.type === "heart") {
+        ctx!.fillStyle = "#e53e3e";
+        ctx!.fillRect(left, yTop + 4, ITEM_SIZE, ITEM_SIZE - 6);
+        ctx!.fillRect(left + 2, yTop + 2, 6, 8);
+        ctx!.fillRect(left + ITEM_SIZE - 8, yTop + 2, 6, 8);
+        ctx!.fillStyle = "#fbb6ce";
+        ctx!.fillRect(left + 4, yTop + 6, 4, 4);
+      } else if (it.type === "umbrella") {
+        ctx!.fillStyle = "#4a5568";
+        ctx!.fillRect(left, yTop + 2, ITEM_SIZE, 10);
+        ctx!.fillStyle = "#2d3748";
+        ctx!.fillRect(left, yTop, ITEM_SIZE, 3);
+        ctx!.fillStyle = "#718096";
+        ctx!.fillRect(left + ITEM_SIZE / 2 - 1, yTop + 12, 2, 8);
+        ctx!.fillRect(left + ITEM_SIZE / 2 - 3, yTop + 18, 4, 2);
+      } else if (it.type === "boots") {
+        ctx!.fillStyle = "#744210";
+        ctx!.fillRect(left + 2, yTop + 6, ITEM_SIZE - 4, ITEM_SIZE - 8);
+        ctx!.fillRect(left, yTop + ITEM_SIZE - 6, ITEM_SIZE, 4);
+        ctx!.fillStyle = "#92400e";
+        ctx!.fillRect(left + 4, yTop + 8, ITEM_SIZE - 8, 4);
+      } else if (it.type === "raincoat") {
+        ctx!.fillStyle = "#d69e2e";
+        ctx!.fillRect(left + 2, yTop + 4, ITEM_SIZE - 4, ITEM_SIZE - 6);
+        ctx!.fillStyle = "#b7791f";
+        ctx!.fillRect(left + 4, yTop, ITEM_SIZE - 8, 6);
+        ctx!.fillStyle = "#faf089";
+        ctx!.fillRect(left + ITEM_SIZE / 2 - 1, yTop + 8, 2, 6);
+      }
     }
 
     const ts = getTimeScale();
@@ -384,6 +480,21 @@ export function createEngine(config: EngineConfig): Engine {
       `lives:${state.lives}  px:${state.px.toFixed(0)} py:${state.py.toFixed(0)} jumps:${state.jumpsLeft}`,
       24,
       72,
+    );
+    const blinkOff = Math.floor(state.realT * 12) % 2 === 0;
+    const showItem = (t: number) =>
+      t > 0 && !(t < ITEM_BLINK_THRESHOLD && blinkOff);
+    const held: string[] = [];
+    if (showItem(state.umbrellaT))
+      held.push(`우산(${state.umbrellaT.toFixed(1)})`);
+    if (showItem(state.bootsT))
+      held.push(`장화(${state.bootsT.toFixed(1)})`);
+    if (showItem(state.raincoatT))
+      held.push(`우비(${state.raincoatT.toFixed(1)})`);
+    ctx!.fillText(
+      `hold: ${held.length ? held.join(" ") : "-"}`,
+      24,
+      100,
     );
 
     if (state.status === "dead") {

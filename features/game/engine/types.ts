@@ -1,4 +1,4 @@
-import type { Stage } from "@/features/stage/types";
+import type { Item, Stage } from "@/features/stage/types";
 
 export type Input = {
   left: boolean;
@@ -61,6 +61,18 @@ export type GameState = {
 
   /** 무적 잔여 시간 (초) — 피격 직후 짧게 지속 */
   iframeT: number;
+
+  /** 스테이지에 남아 있는 아이템 (픽업 시 splice) */
+  items: Item[];
+
+  /** 우산 잔여 시간 (실시간 초) — > 0 이면 비 데미지 자동 방어 */
+  umbrellaT: number;
+
+  /** 장화 잔여 시간 (실시간 초) — > 0 이면 물웅덩이 데미지 자동 방어 */
+  bootsT: number;
+
+  /** 우비 잔여 시간 (실시간 초) — > 0 이면 비/물웅덩이 모두 방어 */
+  raincoatT: number;
 
   /** 진행 / 승리 / 사망 */
   status: GameStatus;
