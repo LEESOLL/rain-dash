@@ -28,6 +28,8 @@ import {
   RAIN_VY,
   SCORE_POPUP_DURATION,
   SCORE_POPUP_RISE,
+  SPEED_MULT_MAX,
+  SPEED_MULT_MIN,
   STILL_TIME_SCALE,
   VIEWPORT_WIDTH,
 } from "./tuning";
@@ -80,6 +82,12 @@ export function createEngine(config: EngineConfig): Engine {
 
   function getTimeScale(): number {
     return input.left || input.right ? 1 : STILL_TIME_SCALE;
+  }
+
+  function getSpeedMult(): number {
+    const ts = getTimeScale();
+    const tsNorm = (ts - STILL_TIME_SCALE) / (1 - STILL_TIME_SCALE);
+    return SPEED_MULT_MIN + tsNorm * (SPEED_MULT_MAX - SPEED_MULT_MIN);
   }
 
   function shelterRoof(s: Shelter): {
@@ -192,7 +200,9 @@ export function createEngine(config: EngineConfig): Engine {
     if (state.px < 0) state.px = 0;
 
     const dxScore = state.px - prevPxScore;
-    if (dxScore > 0) state.score += dxScore * DISTANCE_SCORE_RATE;
+    if (dxScore > 0) {
+      state.score += dxScore * DISTANCE_SCORE_RATE * getSpeedMult();
+    }
     prevPxScore = state.px;
 
     if (state.px >= stage.goalDistance) {

@@ -48,3 +48,7 @@ export const SCORE_POPUP_RISE = 40;
 
 /** 거리 1px당 누적되는 점수. 낮출수록 점수 증가 속도 느려짐 */
 export const DISTANCE_SCORE_RATE = 0.5;
+
+/** 시간 스케일(ts)에 따른 거리 점수 배수 — ts가 STILL일 때 MIN, 1.0일 때 MAX */
+export const SPEED_MULT_MIN = 1.0;
+export const SPEED_MULT_MAX = 5.0;
