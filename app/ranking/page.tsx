@@ -43,6 +43,13 @@ export default function RankingsPage() {
         style={{ backgroundImage: "url(/sprites/background/street-bg.png)" }}
       />
       <div className="pointer-events-none fixed inset-0 z-0 bg-black/55" />
+
+      <div className="fixed left-4 top-4 z-30">
+        <GameButton size="sm" href="/">
+          ← 메인으로
+        </GameButton>
+      </div>
+
       <div className="relative z-10 flex w-full flex-col items-center">
         <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
           랭킹
@@ -51,20 +58,20 @@ export default function RankingsPage() {
         <div className="mb-6 flex gap-2">
           <button
             onClick={() => setTab("cumulative")}
-            className={`rounded px-5 py-2 text-sm transition ${
+            className={`rounded-2xl border-2 px-5 py-2 text-sm font-bold backdrop-blur transition ${
               tab === "cumulative"
-                ? "bg-white font-bold text-black"
-                : "border border-white/30 hover:bg-white/10"
+                ? "border-white/70 bg-sky-400/90 text-white shadow-md shadow-sky-900/30"
+                : "border-white/40 bg-white/15 text-white hover:bg-white/30"
             }`}
           >
             누적점수
           </button>
           <button
             onClick={() => setTab("theme")}
-            className={`rounded px-5 py-2 text-sm transition ${
+            className={`rounded-2xl border-2 px-5 py-2 text-sm font-bold backdrop-blur transition ${
               tab === "theme"
-                ? "bg-white font-bold text-black"
-                : "border border-white/30 hover:bg-white/10"
+                ? "border-white/70 bg-sky-400/90 text-white shadow-md shadow-sky-900/30"
+                : "border-white/40 bg-white/15 text-white hover:bg-white/30"
             }`}
           >
             테마별 랭킹
@@ -79,7 +86,7 @@ export default function RankingsPage() {
               <select
                 value={bundleId}
                 onChange={(e) => setBundleId(e.target.value)}
-                className="rounded border border-white/30 bg-white/10 px-3 py-2 text-white outline-none focus:border-white"
+                className="rounded-2xl border-2 border-white/40 bg-white/15 px-4 py-2.5 text-white outline-none backdrop-blur transition focus:border-sky-300"
               >
                 {bundles.map((b) => (
                   <option
@@ -95,12 +102,6 @@ export default function RankingsPage() {
             </div>
           )}
         </div>
-
-        <div className="mt-10">
-          <GameButton size="md" href="/">
-            ← 메인으로
-          </GameButton>
-        </div>
       </div>
     </main>
   );
@@ -109,38 +110,38 @@ export default function RankingsPage() {
 function RankList({ entries }: { entries: RankEntry[] }) {
   if (entries.length === 0) {
     return (
-      <div className="rounded border border-white/10 py-8 text-center text-sm opacity-50">
+      <div className="rounded-2xl border-2 border-white/30 bg-white/10 py-8 text-center text-sm text-white/70 backdrop-blur">
         기록 없음
       </div>
     );
   }
 
   return (
-    <ol className="flex flex-col gap-1">
+    <ol className="flex flex-col gap-2">
       {entries.map((e, i) => (
         <li
           key={`${e.nickname}-${i}`}
-          className={`flex items-center justify-between rounded px-4 py-3 ${
+          className={`flex items-center justify-between rounded-2xl border-2 px-4 py-3 backdrop-blur ${
             e.isMe
-              ? "border border-yellow-400/60 bg-yellow-400/15"
-              : "bg-white/5"
+              ? "border-sky-300/80 bg-sky-400/30"
+              : "border-white/30 bg-white/15"
           }`}
         >
           <div className="flex items-center gap-3">
             <span className="w-10 opacity-50">#{i + 1}</span>
             <span
-              className={e.isMe ? "font-bold text-yellow-200" : "text-white/90"}
+              className={e.isMe ? "font-bold text-white" : "text-white/90"}
             >
               {e.nickname}
             </span>
             {e.isMe && (
-              <span className="rounded bg-yellow-400 px-1.5 py-0.5 text-[10px] font-bold text-black">
+              <span className="rounded-md bg-white px-1.5 py-0.5 text-[10px] font-bold text-sky-600">
                 ME
               </span>
             )}
           </div>
           <span
-            className={e.isMe ? "font-bold text-yellow-200" : "text-white/80"}
+            className={e.isMe ? "font-bold text-white" : "text-white/80"}
           >
             {e.score.toLocaleString()}
           </span>
