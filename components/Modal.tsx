@@ -6,9 +6,10 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  panelClassName?: string;
 };
 
-export function Modal({ isOpen, onClose, children }: Props) {
+export function Modal({ isOpen, onClose, children, panelClassName }: Props) {
   useEffect(() => {
     if (!isOpen) return;
     function onKey(e: KeyboardEvent) {
@@ -26,7 +27,7 @@ export function Modal({ isOpen, onClose, children }: Props) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg border border-white/20 bg-zinc-900 p-6 font-mono text-white"
+        className={`w-full max-w-md p-6 font-mono text-white ${panelClassName ?? "rounded-lg border border-white/20 bg-zinc-900"}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

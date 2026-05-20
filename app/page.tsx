@@ -91,6 +91,20 @@ export default function Home() {
         </div>
       </main>
 
+      {(nicknameOpen || howtoOpen) && (
+        <div className="fixed left-4 top-4 z-[60]">
+          <GameButton
+            size="sm"
+            onClick={() => {
+              setNicknameOpen(false);
+              setHowtoOpen(false);
+            }}
+          >
+            ✕ 닫기
+          </GameButton>
+        </div>
+      )}
+
       <NicknameModal
         isOpen={nicknameOpen}
         onClose={() => setNicknameOpen(false)}
