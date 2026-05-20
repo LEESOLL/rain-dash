@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { GameButton } from "@/components/GameButton";
+import { Modal } from "@/components/Modal";
 import { createUser } from "@/features/user/userRepository";
 import { refreshUserCache } from "@/features/user/userStore";
-import { Modal } from "@/components/Modal";
 
 type Props = {
   isOpen: boolean;
@@ -39,11 +40,17 @@ function NicknameModalContent({
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose}>
-      <div className="flex flex-col items-center gap-6">
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      panelClassName="rounded-2xl border-2 border-white bg-white/90 backdrop-blur-md shadow-xl"
+    >
+      <div className="flex flex-col items-center gap-6 text-sky-900">
         <div className="text-center">
-          <h2 className="mb-1 text-xl font-bold tracking-widest">닉네임 입력</h2>
-          <p className="text-xs opacity-50">
+          <h2 className="mb-1 text-xl font-bold tracking-widest text-sky-400">
+            닉네임 입력
+          </h2>
+          <p className="text-xs text-sky-700/60">
             건너뛰면 기본 닉네임이 생성됩니다
           </p>
         </div>
@@ -55,19 +62,16 @@ function NicknameModalContent({
           placeholder="Dasher_XXXX"
           maxLength={20}
           autoFocus
-          className="w-full rounded border border-white/30 bg-white/10 px-4 py-2 text-white outline-none focus:border-white"
+          className="w-full rounded-2xl border-2 border-sky-200 bg-white px-4 py-2.5 text-center text-sky-900 outline-none transition placeholder:text-sky-300 focus:border-sky-400"
         />
 
         <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            className="rounded bg-white px-6 py-2 text-sm font-bold text-black transition hover:bg-white/80"
-          >
+          <GameButton size="md" variant="primary" onClick={handleSave}>
             확인
-          </button>
+          </GameButton>
           <button
             onClick={handleSkip}
-            className="rounded border border-white/30 px-6 py-2 text-sm transition hover:bg-white/10"
+            className="rounded-2xl border-2 border-sky-300 bg-sky-50 px-8 py-[clamp(0.5rem,1.5vh,0.7rem)] text-base font-bold text-sky-600 transition hover:bg-sky-100 active:scale-95"
           >
             건너뛰기
           </button>
