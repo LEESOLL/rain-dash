@@ -10,10 +10,15 @@ const PAD_BOTTOM = 40;
 const INTRA_GAP = 80;
 const INTER_GAP = 40;
 const X_CENTER = 0.5;
-const X_AMP = 0.32;
-const X_FREQ = Math.PI / 3;
+const X_AMP = 0.34;
 
 type Position = { x: number; yPx: number };
+
+// 인덱스 기반 의사난수 (0~1) — 매번 같은 불규칙 배치
+function hashRand(i: number): number {
+  const s = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
 
 function computeLayout(themeCount: number): {
   positions: Position[];
@@ -32,7 +37,7 @@ function computeLayout(themeCount: number): {
       const globalIdx = t * STAGES_PER_THEME + s;
       const originalY = PAD_TOP + t * themeBlockHeight + s * INTRA_GAP;
       const yPx = totalHeight - originalY;
-      const x = X_CENTER + X_AMP * Math.sin(globalIdx * X_FREQ);
+      const x = X_CENTER + (hashRand(globalIdx) - 0.5) * 2 * X_AMP;
       positions.push({ x, yPx });
     }
   }
@@ -94,19 +99,20 @@ export function StageMap({ bundles, progress }: Props) {
         <path
           d={pathFull}
           fill="none"
-          stroke="rgb(63 63 70)"
-          strokeWidth="3"
+          stroke="rgba(255,255,255,0.85)"
+          strokeWidth="7"
           strokeLinecap="round"
-          strokeDasharray="5 5"
+          strokeDasharray="0.1 14"
           vectorEffect="non-scaling-stroke"
         />
         {pathActive && (
           <path
             d={pathActive}
             fill="none"
-            stroke="rgb(16 185 129)"
-            strokeWidth="3"
+            stroke="rgb(94 201 226)"
+            strokeWidth="7"
             strokeLinecap="round"
+            strokeDasharray="0.1 14"
             vectorEffect="non-scaling-stroke"
           />
         )}
@@ -198,24 +204,26 @@ function StageCircle({
   status: StageStatus;
 }) {
   const base =
-    "flex h-12 w-12 items-center justify-center rounded-full text-base font-bold transition shadow-lg";
+    "relative flex h-14 w-14 items-center justify-center bg-contain bg-center bg-no-repeat text-base font-bold [image-rendering:pixelated]";
+  const isBright = status === "current" || status === "cleared";
+  const textColor = isBright
+    ? "text-black/75 [text-shadow:_0_1px_0_rgb(255_255_255_/_35%)]"
+    : "text-white/45";
+  const label = <span className="relative z-10">{index}</span>;
+  const style = { backgroundImage: `url(/sprites/nodes/${status}.png)` };
 
   if (status === "placeholder") {
     return (
-      <div
-        className={`${base} bg-zinc-800/80 text-zinc-600 ring-2 ring-zinc-700`}
-      >
-        {index}
+      <div className={`${base} ${textColor}`} style={style}>
+        {label}
       </div>
     );
   }
 
   if (status === "locked") {
     return (
-      <div
-        className={`${base} cursor-not-allowed bg-zinc-800 text-zinc-500 ring-2 ring-zinc-700`}
-      >
-        {index}
+      <div className={`${base} ${textColor} cursor-not-allowed`} style={style}>
+        {label}
       </div>
     );
   }
@@ -224,9 +232,10 @@ function StageCircle({
     return (
       <Link
         href={`/play/${stageId}`}
-        className={`${base} bg-emerald-500 text-black ring-2 ring-emerald-300 hover:bg-emerald-400`}
+        className={`${base} ${textColor} transition hover:brightness-110`}
+        style={style}
       >
-        {index}
+        {label}
       </Link>
     );
   }
@@ -235,9 +244,10 @@ function StageCircle({
   return (
     <Link
       href={`/play/${stageId}`}
-      className={`${base} animate-pulse bg-yellow-400 text-black ring-4 ring-yellow-300/50 hover:bg-yellow-300`}
+      className={`${base} ${textColor} animate-pulse transition hover:brightness-110`}
+      style={style}
     >
-      {index}
+      {label}
     </Link>
   );
 }

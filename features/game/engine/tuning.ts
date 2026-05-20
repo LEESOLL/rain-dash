@@ -1,6 +1,6 @@
 export const VIEWPORT_WIDTH = 1280;
 export const VIEWPORT_HEIGHT = 720;
-export const GROUND_Y = 576;
+export const GROUND_Y = 557;
 
 export const PLAYER_SPEED = 230;
 export const PLAYER_GRAVITY = 1700;
@@ -22,14 +22,14 @@ export const RAIN_STREAK_LENGTH = 30;
 export const MAX_LIVES = 3;
 export const IFRAME_DURATION = 1.0;
 
-export const LIGHTNING_WIDTH = 50;
+export const LIGHTNING_WIDTH = 30;
 export const LIGHTNING_WARN_DURATION = 1.2;
 export const LIGHTNING_STRIKE_DURATION = 0.15;
 export const LIGHTNING_LINGER_DURATION = 0.5;
 export const LIGHTNING_SPAWN_MARGIN = 100;
 export const LIGHTNING_PLAYER_BIAS_RADIUS = 280;
 
-export const ITEM_SIZE = 22;
+export const ITEM_SIZE = 38;
 export const ITEM_DURATION = 3;
 export const ITEM_BLINK_THRESHOLD = 1;
 

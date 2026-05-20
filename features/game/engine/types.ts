@@ -1,4 +1,4 @@
-import type { Item, Stage } from "@/features/stage/types";
+import type { Item, Puddle, Stage } from "@/features/stage/types";
 
 export type Input = {
   left: boolean;
@@ -94,6 +94,9 @@ export type GameState = {
 
   /** 스테이지에 남아 있는 아이템 (픽업 시 splice) */
   items: Item[];
+
+  /** 물웅덩이 (게임 시작 시 생성, shelter 회피) */
+  puddles: Puddle[];
 
   /** 우산 잔여 시간 (실시간 초) — > 0 이면 비 데미지 자동 방어 */
   umbrellaT: number;
