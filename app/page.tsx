@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GameButton } from "@/components/GameButton";
 import { SettingsModal } from "@/features/settings/components/SettingsModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
@@ -30,40 +30,48 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex min-h-dvh items-center justify-center bg-black font-mono text-white">
-        <div className="flex flex-col items-center gap-12 px-8">
-          <div className="text-center">
-            <h1 className="text-6xl font-bold tracking-widest">RAIN DASH</h1>
-            <p className="mt-3 text-xs tracking-wider opacity-50">
+      <main className="relative flex h-dvh items-center justify-center overflow-hidden font-mono text-white">
+        <div className="animate-bg-slide absolute inset-0 z-0 flex w-[200%]">
+          <div
+            className="h-full w-1/2 bg-cover bg-center"
+            style={{
+              backgroundImage: "url(/sprites/background/street-bg.png)",
+            }}
+          />
+          <div
+            className="h-full w-1/2 bg-cover bg-center"
+            style={{
+              backgroundImage: "url(/sprites/background/street-bg.png)",
+            }}
+          />
+        </div>
+        <div className="pointer-events-none absolute inset-0 z-0 bg-black/15" />
+
+        <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8">
+          <div className="flex flex-col items-center text-center">
+            <img
+              src="/sprites/ui/title.png"
+              alt="RAIN DASH"
+              className="w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+            />
+            <p className="mt-1 text-xs tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)]">
               time moves fast when you move fast
             </p>
           </div>
 
-          <div className="flex w-64 flex-col gap-3">
-            <button
-              onClick={handleStart}
-              className="rounded bg-white px-8 py-3 text-lg font-bold tracking-widest text-black transition hover:bg-white/80"
-            >
+          <div className="flex w-56 flex-col gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64">
+            <GameButton variant="primary" size="lg" onClick={handleStart}>
               게임 시작
-            </button>
-            <button
-              onClick={() => setHowtoOpen(true)}
-              className="rounded border border-white/30 px-8 py-3 text-lg tracking-widest transition hover:bg-white/10"
-            >
+            </GameButton>
+            <GameButton size="md" onClick={() => setHowtoOpen(true)}>
               게임 방법
-            </button>
-            <Link
-              href="/ranking"
-              className="rounded border border-white/30 px-8 py-3 text-center text-lg tracking-widest transition hover:bg-white/10"
-            >
+            </GameButton>
+            <GameButton size="md" href="/ranking">
               랭킹 보기
-            </Link>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="rounded border border-white/30 px-8 py-3 text-lg tracking-widest transition hover:bg-white/10"
-            >
+            </GameButton>
+            <GameButton size="md" onClick={() => setSettingsOpen(true)}>
               설정
-            </button>
+            </GameButton>
           </div>
         </div>
       </main>
@@ -73,10 +81,7 @@ export default function Home() {
         onClose={() => setNicknameOpen(false)}
         onConfirm={handleNicknameConfirmed}
       />
-      <HowToPlayModal
-        isOpen={howtoOpen}
-        onClose={() => setHowtoOpen(false)}
-      />
+      <HowToPlayModal isOpen={howtoOpen} onClose={() => setHowtoOpen(false)} />
       <SettingsModal
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}

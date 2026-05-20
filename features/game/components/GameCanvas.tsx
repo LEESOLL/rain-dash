@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { GameButton } from "@/components/GameButton";
 import { getNextStageId } from "@/features/stage/stageRepository";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
@@ -45,7 +46,11 @@ export function GameCanvas({ stage }: Props) {
       } else if (e.code === "ArrowRight" || e.code === "KeyD") {
         engine.setInput({ right: true });
         e.preventDefault();
-      } else if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+      } else if (
+        e.code === "Space" ||
+        e.code === "ArrowUp" ||
+        e.code === "KeyW"
+      ) {
         engine.setInput({ jump: true });
         e.preventDefault();
       } else if (e.code === "KeyR") {
@@ -65,7 +70,11 @@ export function GameCanvas({ stage }: Props) {
         engine.setInput({ left: false });
       } else if (e.code === "ArrowRight" || e.code === "KeyD") {
         engine.setInput({ right: false });
-      } else if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+      } else if (
+        e.code === "Space" ||
+        e.code === "ArrowUp" ||
+        e.code === "KeyW"
+      ) {
         engine.setInput({ jump: false });
       }
     }
@@ -100,29 +109,20 @@ export function GameCanvas({ stage }: Props) {
       {status !== "playing" && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[10%] z-10 flex justify-center">
           <div className="pointer-events-auto flex gap-3">
-            <button
-              onClick={handleExit}
-              className="rounded border border-white/40 bg-black/50 px-5 py-2 text-sm tracking-wider text-white transition hover:bg-white/10"
-            >
+            <GameButton size="md" onClick={handleExit}>
               나가기
-            </button>
-            <button
+            </GameButton>
+            <GameButton
+              size="md"
+              variant={retryIsPrimary ? "primary" : "secondary"}
               onClick={handleRetry}
-              className={`rounded px-5 py-2 text-sm tracking-wider transition ${
-                retryIsPrimary
-                  ? "bg-white font-bold text-black hover:bg-white/80"
-                  : "border border-white/40 bg-black/50 text-white hover:bg-white/10"
-              }`}
             >
               다시하기
-            </button>
+            </GameButton>
             {showNext && (
-              <button
-                onClick={handleNext}
-                className="rounded bg-emerald-500 px-5 py-2 text-sm font-bold tracking-wider text-black transition hover:bg-emerald-400"
-              >
+              <GameButton size="md" variant="primary" onClick={handleNext}>
                 다음 스테이지 ▶
-              </button>
+              </GameButton>
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useSyncExternalStore } from "react";
+import { GameButton } from "@/components/GameButton";
 import { StageMap } from "@/features/stage/components/StageMap";
 import { getProgress } from "@/features/stage/stageProgressRepository";
 import { getBundles } from "@/features/stage/stageRepository";
@@ -48,7 +48,9 @@ export default function StageSelectPage() {
         current.scrollIntoView({ block: "center" });
         return;
       }
-      const cleared = document.querySelectorAll('[data-stage-status="cleared"]');
+      const cleared = document.querySelectorAll(
+        '[data-stage-status="cleared"]',
+      );
       if (cleared.length > 0) {
         cleared[cleared.length - 1].scrollIntoView({ block: "center" });
         return;
@@ -66,19 +68,28 @@ export default function StageSelectPage() {
   const bundles = getBundles();
 
   return (
-    <main className="flex min-h-dvh flex-col items-center bg-black px-4 py-10 font-mono text-white">
-      <h1 className="mb-8 text-4xl font-bold tracking-widest">스테이지 선택</h1>
+    <main className="relative flex min-h-dvh flex-col items-center px-4 py-10 font-mono text-white">
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: "url(/sprites/background/street-bg.png)" }}
+      />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-black/45" />
 
-      <div className="w-full max-w-xl">
-        <StageMap bundles={bundles} progress={progress} />
+      <div className="relative z-10 flex w-full flex-col items-center">
+        <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
+          스테이지 선택
+        </h1>
+
+        <div className="w-full max-w-xl">
+          <StageMap bundles={bundles} progress={progress} />
+        </div>
+
+        <div className="mt-10">
+          <GameButton size="md" href="/">
+            ← 메인으로
+          </GameButton>
+        </div>
       </div>
-
-      <Link
-        href="/"
-        className="mt-10 rounded border border-white/30 px-6 py-2 text-sm transition hover:bg-white/10"
-      >
-        ← 메인으로
-      </Link>
     </main>
   );
 }
