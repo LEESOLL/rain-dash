@@ -1,16 +1,68 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "PF Stardust";
+  src: url("/fonts/PFStardust-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PF Stardust";
+  src: url("/fonts/PFStardust-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PF Stardust";
+  src: url("/fonts/PFStardust-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "PF Stardust", sans-serif;
+  --font-mono: "PF Stardust", sans-serif;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   background: #000;
   color: #fff;
+  font-family: "PF Stardust", sans-serif;
   overscroll-behavior: none;
+}
+
+/* Tailwind font-mono utility를 PF Stardust로 강제 (unlayered가 utility보다 우선) */
+.font-mono,
+.font-sans {
+  font-family: "PF Stardust", sans-serif;
+}
+button,
+input,
+select,
+textarea {
+  font-family: "PF Stardust", sans-serif;
 }
 
 /* Pixel art: 캔버스/이미지 스무딩 해제 */
 canvas,
 img[data-pixel] {
   image-rendering: pixelated;
+}
+
+/* 메인 배경 잔잔한 가로 스크롤 */
+@keyframes bg-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-bg-slide {
+  animation: bg-slide 50s linear infinite;
+  will-change: transform;
 }
