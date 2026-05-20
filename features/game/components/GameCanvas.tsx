@@ -16,10 +16,46 @@ type Props = {
 export function GameCanvas({ stage }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
   const [status, setStatus] = useState<GameStatus>("playing");
 
   const nextStageId = getNextStageId(stage);
+
+  useEffect(() => {
+    const bgm = new Audio("/audio/gaming_bgm.mp3");
+    bgm.loop = true;
+    bgm.volume = 0.4;
+    bgm.play().catch(() => {});
+    bgmRef.current = bgm;
+    return () => {
+      bgm.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (status === "dead") {
+      bgmRef.current?.pause();
+      const audio = new Audio("/audio/game_over.mp3");
+      audio.volume = 0.6;
+      audio.play().catch(() => {});
+    } else if (status === "won") {
+      bgmRef.current?.pause();
+      const win = new Audio("/audio/win.wav");
+      win.volume = 0.6;
+      win.play().catch(() => {});
+      const scoreAudio = new Audio("/audio/score_rolling_up.mp3");
+      scoreAudio.volume = 0.5;
+      const timer = setTimeout(() => {
+        scoreAudio.play().catch(() => {});
+      }, 400);
+      return () => {
+        win.pause();
+        scoreAudio.pause();
+        clearTimeout(timer);
+      };
+    }
+  }, [status]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

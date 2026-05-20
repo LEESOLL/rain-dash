@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { SettingsModal } from "@/features/settings/components/SettingsModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
@@ -13,6 +13,21 @@ export default function Home() {
   const [nicknameOpen, setNicknameOpen] = useState(false);
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio("/audio/waiting_bgm.mp3");
+    audio.loop = true;
+    audio.volume = 0.8;
+    audio.play().catch(() => {});
+    const resume = () => {
+      audio.play().catch(() => {});
+    };
+    window.addEventListener("pointerdown", resume);
+    return () => {
+      audio.pause();
+      window.removeEventListener("pointerdown", resume);
+    };
+  }, []);
 
   function handleStart() {
     const user = readCachedUser();
