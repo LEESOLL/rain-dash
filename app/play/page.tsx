@@ -75,6 +75,12 @@ export default function StageSelectPage() {
       />
       <div className="pointer-events-none fixed inset-0 z-0 bg-black/45" />
 
+      <div className="fixed left-4 top-4 z-30">
+        <GameButton size="sm" href="/">
+          ← 메인으로
+        </GameButton>
+      </div>
+
       <div className="relative z-10 flex w-full flex-col items-center">
         <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
           스테이지 선택
@@ -82,12 +88,6 @@ export default function StageSelectPage() {
 
         <div className="w-full max-w-xl">
           <StageMap bundles={bundles} progress={progress} />
-        </div>
-
-        <div className="mt-10">
-          <GameButton size="md" href="/">
-            ← 메인으로
-          </GameButton>
         </div>
       </div>
     </main>
