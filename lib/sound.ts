@@ -37,26 +37,51 @@ export function setAudioPref(on: boolean): void {
   prefListeners.forEach((cb) => cb());
 }
 
+let resumeHandler: (() => void) | null = null;
+
+function armResume(): void {
+  if (resumeHandler) return;
+  resumeHandler = () => {
+    if (!isAudioEnabled() || !bgmAudio) {
+      clearResume();
+      return;
+    }
+    bgmAudio.play().then(clearResume, () => {});
+  };
+
+  window.addEventListener("click", resumeHandler);
+  window.addEventListener("touchend", resumeHandler);
+  window.addEventListener("keydown", resumeHandler);
+}
+
+function clearResume(): void {
+  if (!resumeHandler) return;
+  window.removeEventListener("click", resumeHandler);
+  window.removeEventListener("touchend", resumeHandler);
+  window.removeEventListener("keydown", resumeHandler);
+  resumeHandler = null;
+}
+
 export function playBgm(src: string, volume = 0.5): void {
   bgmSrc = src;
   bgmVolume = volume;
   if (!isAudioEnabled() || typeof Audio === "undefined") return;
-  if (!bgmAudio || !bgmAudio.src.endsWith(src)) {
+  const reused = bgmAudio !== null && bgmAudio.src.endsWith(src);
+  if (!reused) {
     stopBgm();
     bgmAudio = new Audio(src);
     bgmAudio.loop = true;
     bgmAudio.volume = volume;
   }
-  bgmAudio.play().catch(() => {
-    const resume = () => {
-      window.removeEventListener("pointerdown", resume);
-      if (isAudioEnabled() && bgmAudio) bgmAudio.play().catch(() => {});
-    };
-    window.addEventListener("pointerdown", resume, { once: true });
+  if (!bgmAudio) return;
+  armResume();
+  bgmAudio.play().then(clearResume, (err: DOMException) => {
+    if (err && err.name === "AbortError") clearResume();
   });
 }
 
 export function stopBgm(): void {
+  clearResume();
   if (bgmAudio) {
     bgmAudio.pause();
     bgmAudio = null;
