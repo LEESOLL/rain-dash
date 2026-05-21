@@ -24,12 +24,13 @@ export function GameCanvas({ stage }: Props) {
   const nextStageId = getNextStageId(stage);
 
   useEffect(() => {
-    playBgm("/audio/gaming_bgm.mp3", 0.4);
     return () => clearBgm();
   }, []);
 
   useEffect(() => {
-    if (status === "dead") {
+    if (status === "playing") {
+      playBgm("/audio/gaming_bgm.mp3", 0.4);
+    } else if (status === "dead") {
       stopBgm();
       if (isAudioEnabled()) {
         const audio = new Audio("/audio/game_over.mp3");
