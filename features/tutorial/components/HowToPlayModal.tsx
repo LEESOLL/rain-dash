@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Modal } from "@/components/Modal";
+import { useIsTouch } from "@/lib/touch";
 
 type Props = {
   isOpen: boolean;
@@ -49,6 +50,7 @@ function Cell({
 }
 
 export function HowToPlayModal({ isOpen, onClose }: Props) {
+  const isTouch = useIsTouch();
   return (
     <Modal
       isOpen={isOpen}
@@ -62,21 +64,46 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
 
         <div className="flex flex-col gap-2">
           <SectionLabel>조작</SectionLabel>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
-              <Key>←</Key>
-              <Key>→</Key>
-              <span className="text-sm font-medium text-sky-900/80">
-                좌우 이동
-              </span>
+          {isTouch ? (
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
+                <span className="font-bold text-sky-500">화면 왼쪽</span>
+                <span className="text-sm font-medium text-sky-900/80">뒤로</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
+                <span className="font-bold text-sky-500">화면 오른쪽</span>
+                <span className="text-sm font-medium text-sky-900/80">
+                  앞으로
+                </span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
+                <span className="font-bold text-sky-500">화면 가운데</span>
+                <span className="text-sm font-medium text-sky-900/80">
+                  점프{" "}
+                  <span className="font-bold text-sky-500">
+                    (두 번 탭 2단 점프)
+                  </span>
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
-              <Key>↑</Key>
-              <span className="text-sm font-medium text-sky-900/80">
-                점프 <span className="font-bold text-sky-500">(2단 점프)</span>
-              </span>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
+                <Key>←</Key>
+                <Key>→</Key>
+                <span className="text-sm font-medium text-sky-900/80">
+                  좌우 이동
+                </span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
+                <Key>↑</Key>
+                <span className="text-sm font-medium text-sky-900/80">
+                  점프{" "}
+                  <span className="font-bold text-sky-500">(2단 점프)</span>
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="rounded-2xl border border-sky-200 bg-sky-50/80 px-4 py-3">

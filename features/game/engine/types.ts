@@ -115,6 +115,8 @@ export type EngineConfig = {
   canvas: HTMLCanvasElement;
   stage: Stage;
   onStateChange?: (state: GameState) => void;
+  /** 모든 에셋 로딩이 끝나 첫 렌더가 가능해진 시점에 1회 호출 */
+  onReady?: () => void;
 };
 
 export type Engine = {
