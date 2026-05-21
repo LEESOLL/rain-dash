@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { SettingsModal } from "@/features/settings/components/SettingsModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
+import { ensureAuth } from "@/features/user/authRepository";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
 import { readCachedUser } from "@/features/user/userStore";
 
@@ -13,6 +14,10 @@ export default function Home() {
   const [nicknameOpen, setNicknameOpen] = useState(false);
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    ensureAuth().catch((e) => console.error("anonymous auth failed", e));
+  }, []);
 
   useEffect(() => {
     const audio = new Audio("/audio/waiting_bgm.mp3");
