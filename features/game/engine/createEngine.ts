@@ -1,3 +1,4 @@
+import { playSoundEffect } from "@/lib/sound";
 import * as repo from "@/features/stage/stageProgressRepository";
 import * as T from "./tuning";
 import type { Item, ItemType, Puddle, Shelter } from "@/features/stage/types";
@@ -364,10 +365,7 @@ export function createEngine(config: EngineConfig): Engine {
     }
     function applyDamage() {
         if (state.iframeT > 0) return;
-        if (hurtAudio) {
-            hurtAudio.currentTime = 0;
-            hurtAudio.play().catch(() => {});
-        }
+        playSoundEffect(hurtAudio);
         state.lives--;
         state.iframeT = T["IFRAME_DURATION"];
         if (state.lives <= 0) {
@@ -375,10 +373,7 @@ export function createEngine(config: EngineConfig): Engine {
         }
     }
     function pickupItem(it: Item) {
-        if (itemAudio) {
-            itemAudio.currentTime = 0;
-            itemAudio.play().catch(() => {});
-        }
+        playSoundEffect(itemAudio);
         const points = T["ITEM_SCORE"][it.type];
         state.score += points;
         state.scorePopups.push({
@@ -555,10 +550,7 @@ export function createEngine(config: EngineConfig): Engine {
                 if (ev.phase === "warn") {
                     ev.phase = "strike";
                     ev.t = T["LIGHTNING_STRIKE_DURATION"];
-                    if (thunderAudio) {
-                        thunderAudio.currentTime = 0;
-                        thunderAudio.play().catch(() => {});
-                    }
+                    playSoundEffect(thunderAudio);
                 } else if (ev.phase === "strike") {
                     ev.phase = "linger";
                     ev.t = T["LIGHTNING_LINGER_DURATION"];

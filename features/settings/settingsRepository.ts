@@ -18,4 +18,5 @@ export function resetAllData(): void {
   removeData("rd:user");
   removeData("rd:progress");
   removeData("rd:settings");
+  removeData("rd:audio");
 }

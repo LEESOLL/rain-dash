@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { submitMyScore } from "@/features/ranking/rankingRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
+import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
 import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
@@ -17,34 +18,30 @@ type Props = {
 export function GameCanvas({ stage }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
-  const bgmRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
   const [status, setStatus] = useState<GameStatus>("playing");
 
   const nextStageId = getNextStageId(stage);
 
   useEffect(() => {
-    const bgm = new Audio("/audio/gaming_bgm.mp3");
-    bgm.loop = true;
-    bgm.volume = 0.4;
-    bgm.play().catch(() => {});
-    bgmRef.current = bgm;
-    return () => {
-      bgm.pause();
-    };
+    playBgm("/audio/gaming_bgm.mp3", 0.4);
+    return () => clearBgm();
   }, []);
 
   useEffect(() => {
     if (status === "dead") {
-      bgmRef.current?.pause();
-      const audio = new Audio("/audio/game_over.mp3");
-      audio.volume = 0.6;
-      audio.play().catch(() => {});
+      stopBgm();
+      if (isAudioEnabled()) {
+        const audio = new Audio("/audio/game_over.mp3");
+        audio.volume = 0.6;
+        audio.play().catch(() => {});
+      }
     } else if (status === "won") {
-      bgmRef.current?.pause();
+      stopBgm();
       submitMyScore(stage.bundleId).catch((e) =>
         console.error("score submit failed", e),
       );
+      if (!isAudioEnabled()) return;
       const win = new Audio("/audio/win.wav");
       win.volume = 0.6;
       win.play().catch(() => {});

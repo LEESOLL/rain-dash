@@ -2,14 +2,11 @@
 
 import { useState } from "react";
 import { refreshRanking } from "@/features/ranking/rankingStore";
-import {
-  getSettings,
-  resetAllData,
-  setSoundEnabled,
-} from "@/features/settings/settingsRepository";
+import { resetAllData } from "@/features/settings/settingsRepository";
 import { refreshUserCache } from "@/features/user/userStore";
 import { GameButton } from "@/components/GameButton";
 import { Modal } from "@/components/Modal";
+import { isAudioEnabled, setAudioPref } from "@/lib/sound";
 
 type Props = {
   isOpen: boolean;
@@ -22,15 +19,13 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 }
 
 function SettingsModalContent({ onClose }: { onClose: () => void }) {
-  const [sound, setSound] = useState<boolean>(
-    () => getSettings().soundEnabled,
-  );
+  const [sound, setSound] = useState<boolean>(() => isAudioEnabled());
   const [confirmReset, setConfirmReset] = useState(false);
 
   function handleSoundToggle() {
     const next = !sound;
     setSound(next);
-    setSoundEnabled(next);
+    setAudioPref(next);
   }
 
   function handleReset() {

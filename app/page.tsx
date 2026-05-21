@@ -1,13 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { GameButton } from "@/components/GameButton";
+import { AudioPromptModal } from "@/features/settings/components/AudioPromptModal";
 import { SettingsModal } from "@/features/settings/components/SettingsModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
 import { ensureAuth } from "@/features/user/authRepository";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
 import { readCachedUser } from "@/features/user/userStore";
+import {
+  clearBgm,
+  getAudioPref,
+  playBgm,
+  setAudioPref,
+  subscribeAudioPref,
+} from "@/lib/sound";
 
 export default function Home() {
   const router = useRouter();
@@ -15,24 +23,25 @@ export default function Home() {
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const audioPref = useSyncExternalStore(
+    subscribeAudioPref,
+    getAudioPref,
+    () => "off" as const,
+  );
+  const audioPromptOpen = audioPref === null;
+
   useEffect(() => {
     ensureAuth().catch((e) => console.error("anonymous auth failed", e));
   }, []);
 
   useEffect(() => {
-    const audio = new Audio("/audio/waiting_bgm.mp3");
-    audio.loop = true;
-    audio.volume = 0.8;
-    audio.play().catch(() => {});
-    const resume = () => {
-      audio.play().catch(() => {});
-    };
-    window.addEventListener("pointerdown", resume);
-    return () => {
-      audio.pause();
-      window.removeEventListener("pointerdown", resume);
-    };
+    playBgm("/audio/waiting_bgm.mp3", 0.8);
+    return () => clearBgm();
   }, []);
+
+  function handleAudioChoose(enabled: boolean) {
+    setAudioPref(enabled);
+  }
 
   function handleStart() {
     const user = readCachedUser();
@@ -51,18 +60,16 @@ export default function Home() {
   return (
     <>
       <main className="relative flex h-dvh items-center justify-center overflow-hidden font-mono text-white">
-        <div className="animate-bg-slide absolute inset-0 z-0 flex w-[200%]">
-          <div
-            className="h-full w-1/2 bg-cover bg-center"
-            style={{
-              backgroundImage: "url(/sprites/background/street-bg.png)",
-            }}
+        <div className="animate-bg-slide pointer-events-none absolute inset-0 z-0 flex">
+          <img
+            src="/sprites/background/street-bg.png"
+            alt=""
+            className="h-full w-auto max-w-none select-none"
           />
-          <div
-            className="h-full w-1/2 bg-cover bg-center"
-            style={{
-              backgroundImage: "url(/sprites/background/street-bg.png)",
-            }}
+          <img
+            src="/sprites/background/street-bg.png"
+            alt=""
+            className="h-full w-auto max-w-none select-none"
           />
         </div>
         <div className="pointer-events-none absolute inset-0 z-0 bg-black/15" />
@@ -120,6 +127,7 @@ export default function Home() {
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
+      <AudioPromptModal isOpen={audioPromptOpen} onChoose={handleAudioChoose} />
     </>
   );
 }
