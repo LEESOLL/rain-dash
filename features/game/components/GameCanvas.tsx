@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameButton } from "@/components/GameButton";
+import { submitMyScore } from "@/features/ranking/rankingRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
@@ -41,6 +42,9 @@ export function GameCanvas({ stage }: Props) {
       audio.play().catch(() => {});
     } else if (status === "won") {
       bgmRef.current?.pause();
+      submitMyScore(stage.bundleId).catch((e) =>
+        console.error("score submit failed", e),
+      );
       const win = new Audio("/audio/win.wav");
       win.volume = 0.6;
       win.play().catch(() => {});
