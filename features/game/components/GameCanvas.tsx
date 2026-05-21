@@ -98,7 +98,7 @@ export function GameCanvas({ stage }: Props) {
         }
         e.preventDefault();
       } else if (e.code === "Escape") {
-        router.replace("/play");
+        router.replace("/?view=stage");
         e.preventDefault();
       }
     }
@@ -129,7 +129,7 @@ export function GameCanvas({ stage }: Props) {
   }, [stage, router]);
 
   function handleExit() {
-    router.replace("/play");
+    router.replace("/?view=stage");
   }
   function handleRetry() {
     engineRef.current?.restart();

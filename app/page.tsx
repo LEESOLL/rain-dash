@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { GameButton } from "@/components/GameButton";
+import { RankingModal } from "@/features/ranking/components/RankingModal";
 import { AudioPromptModal } from "@/features/settings/components/AudioPromptModal";
 import { SettingsModal } from "@/features/settings/components/SettingsModal";
+import { StageModal } from "@/features/stage/components/StageModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
 import { ensureAuth } from "@/features/user/authRepository";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
@@ -17,11 +18,18 @@ import {
   subscribeAudioPref,
 } from "@/lib/sound";
 
+type View = "stage" | "ranking";
+
 export default function Home() {
-  const router = useRouter();
   const [nicknameOpen, setNicknameOpen] = useState(false);
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [view, setView] = useState<View | null>(() => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get("view") === "stage"
+      ? "stage"
+      : null;
+  });
 
   const audioPref = useSyncExternalStore(
     subscribeAudioPref,
@@ -39,14 +47,19 @@ export default function Home() {
     return () => clearBgm();
   }, []);
 
+  useEffect(() => {
+    if (window.location.search) {
+      window.history.replaceState(null, "", "/");
+    }
+  }, []);
+
   function handleAudioChoose(enabled: boolean) {
     setAudioPref(enabled);
   }
 
   function handleStart() {
-    const user = readCachedUser();
-    if (user) {
-      router.push("/play");
+    if (readCachedUser()) {
+      setView("stage");
     } else {
       setNicknameOpen(true);
     }
@@ -54,7 +67,7 @@ export default function Home() {
 
   function handleNicknameConfirmed() {
     setNicknameOpen(false);
-    router.push("/play");
+    setView("stage");
   }
 
   return (
@@ -74,34 +87,39 @@ export default function Home() {
         </div>
         <div className="pointer-events-none absolute inset-0 z-0 bg-black/15" />
 
-        <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8">
-          <div className="flex flex-col items-center text-center">
-            <img
-              src="/sprites/ui/title.png"
-              alt="RAIN DASH"
-              className="w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-            />
-            <p className="mt-1 text-xs tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)]">
-              time moves fast when you move fast
-            </p>
-          </div>
+        {view === null && (
+          <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8">
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/sprites/ui/title.png"
+                alt="RAIN DASH"
+                className="w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+              />
+              <p className="mt-1 text-xs tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)]">
+                time moves fast when you move fast
+              </p>
+            </div>
 
-          <div className="flex w-56 flex-col gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64">
-            <GameButton variant="primary" size="lg" onClick={handleStart}>
-              게임 시작
-            </GameButton>
-            <GameButton size="md" onClick={() => setHowtoOpen(true)}>
-              게임 방법
-            </GameButton>
-            <GameButton size="md" href="/ranking">
-              랭킹 보기
-            </GameButton>
-            <GameButton size="md" onClick={() => setSettingsOpen(true)}>
-              설정
-            </GameButton>
+            <div className="flex w-56 flex-col gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64">
+              <GameButton variant="primary" size="lg" onClick={handleStart}>
+                게임 시작
+              </GameButton>
+              <GameButton size="md" onClick={() => setHowtoOpen(true)}>
+                게임 방법
+              </GameButton>
+              <GameButton size="md" onClick={() => setView("ranking")}>
+                랭킹 보기
+              </GameButton>
+              <GameButton size="md" onClick={() => setSettingsOpen(true)}>
+                설정
+              </GameButton>
+            </div>
           </div>
-        </div>
+        )}
       </main>
+
+      {view === "stage" && <StageModal onClose={() => setView(null)} />}
+      {view === "ranking" && <RankingModal onClose={() => setView(null)} />}
 
       {(nicknameOpen || howtoOpen) && (
         <div className="fixed left-4 top-4 z-[60]">

@@ -15,7 +15,11 @@ import { getBundles } from "@/features/stage/stageRepository";
 
 type Tab = "cumulative" | "theme";
 
-export default function RankingsPage() {
+type Props = {
+  onClose: () => void;
+};
+
+export function RankingModal({ onClose }: Props) {
   const [tab, setTab] = useState<Tab>("cumulative");
   const [bundleId, setBundleId] = useState<string>("rainy-day");
 
@@ -42,20 +46,14 @@ export default function RankingsPage() {
   const bundles = getBundles();
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center px-4 py-12 font-mono text-white">
-      <div
-        className="fixed inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: "url(/sprites/background/street-bg.png)" }}
-      />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-black/55" />
-
-      <div className="fixed left-4 top-4 z-30">
-        <GameButton size="sm" href="/">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/55 font-mono text-white">
+      <div className="fixed left-4 top-4 z-[60]">
+        <GameButton size="sm" onClick={onClose}>
           ← 메인으로
         </GameButton>
       </div>
 
-      <div className="relative z-10 flex w-full flex-col items-center">
+      <div className="relative flex min-h-dvh flex-col items-center px-4 py-12">
         <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
           랭킹
         </h1>
@@ -102,7 +100,7 @@ export default function RankingsPage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -128,9 +126,7 @@ function RankList({ entries }: { entries: RankEntry[] }) {
         >
           <div className="flex items-center gap-3">
             <span className="w-10 opacity-50">#{i + 1}</span>
-            <span
-              className={e.isMe ? "font-bold text-white" : "text-white/90"}
-            >
+            <span className={e.isMe ? "font-bold text-white" : "text-white/90"}>
               {e.nickname}
             </span>
             {e.isMe && (
@@ -139,9 +135,7 @@ function RankList({ entries }: { entries: RankEntry[] }) {
               </span>
             )}
           </div>
-          <span
-            className={e.isMe ? "font-bold text-white" : "text-white/80"}
-          >
+          <span className={e.isMe ? "font-bold text-white" : "text-white/80"}>
             {e.score.toLocaleString()}
           </span>
         </li>
