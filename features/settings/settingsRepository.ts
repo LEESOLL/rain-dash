@@ -1,3 +1,5 @@
+import { clearMyRanking } from "@/features/ranking/rankingRepository";
+import { clearProgress } from "@/features/stage/stageProgressRepository";
 import { getData, removeData, setData } from "@/lib/storage";
 import type { Settings } from "./types";
 
@@ -16,7 +18,8 @@ export function setSoundEnabled(enabled: boolean): void {
 
 export function resetAllData(): void {
   removeData("rd:user");
-  removeData("rd:progress");
   removeData("rd:settings");
   removeData("rd:audio");
+  clearProgress().catch((e) => console.error("progress reset failed", e));
+  clearMyRanking().catch((e) => console.error("ranking reset failed", e));
 }

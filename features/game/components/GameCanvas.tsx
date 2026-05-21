@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { submitMyScore } from "@/features/ranking/rankingRepository";
+import { fetchProgress } from "@/features/stage/stageProgressRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
 import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
@@ -24,6 +25,7 @@ export function GameCanvas({ stage }: Props) {
   const nextStageId = getNextStageId(stage);
 
   useEffect(() => {
+    fetchProgress().catch((e) => console.error("progress fetch failed", e));
     return () => clearBgm();
   }, []);
 

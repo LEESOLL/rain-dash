@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   limit,
@@ -44,6 +45,12 @@ export async function submitMyScore(bundleId: string): Promise<void> {
     },
     { merge: true },
   );
+}
+
+/** 내 랭킹 문서를 삭제 (진행도 초기화 시 리더보드에서도 제거) */
+export async function clearMyRanking(): Promise<void> {
+  const uid = await ensureAuth();
+  await deleteDoc(doc(db, "rankings", uid));
 }
 
 export async function fetchCumulativeRanking(): Promise<RankEntry[]> {

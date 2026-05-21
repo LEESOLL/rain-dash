@@ -1,7 +1,14 @@
-import { setData, getData } from "@/lib/storage";
+import {
+  arrayUnion,
+  deleteDoc,
+  doc,
+  getDoc,
+  increment,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { ensureAuth } from "@/features/user/authRepository";
 import type { StageProgress } from "./types";
-
-const KEY = "rd:progress";
 
 const DEFAULT_PROGRESS: StageProgress = {
   clearedStageIds: [],
@@ -10,61 +17,126 @@ const DEFAULT_PROGRESS: StageProgress = {
   cumulativeScore: 0,
 };
 
-export function getProgress(): StageProgress {
-  return getData<StageProgress>(KEY, DEFAULT_PROGRESS);
+// 서버(Firestore)에서 가져온 진행도를 담는 인메모리 캐시.
+// 동기 소비자(엔진·랭킹)는 이 캐시를 읽고, 영속화는 Firestore가 담당한다.
+let cache: StageProgress = DEFAULT_PROGRESS;
+const listeners = new Set<() => void>();
+
+function notify() {
+  for (const l of listeners) l();
 }
 
-export function markCleared(stageId: string): StageProgress {
-  const current = getProgress();
-  if (current.clearedStageIds.includes(stageId)) return current;
+function progressRef(uid: string) {
+  return doc(db, "progress", uid);
+}
 
-  const updated: StageProgress = {
-    ...current,
-    clearedStageIds: [...current.clearedStageIds, stageId],
+// --- useSyncExternalStore 용 ---
+export function subscribeProgress(cb: () => void): () => void {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
   };
-  setData(KEY, updated);
-  return updated;
+}
+
+export function getCachedProgress(): StageProgress {
+  return cache;
+}
+
+export function getServerProgressSnapshot(): StageProgress {
+  return DEFAULT_PROGRESS;
+}
+
+export async function fetchProgress(): Promise<StageProgress> {
+  const uid = await ensureAuth();
+  const snap = await getDoc(progressRef(uid));
+  cache = snap.exists()
+    ? { ...DEFAULT_PROGRESS, ...(snap.data() as Partial<StageProgress>) }
+    : DEFAULT_PROGRESS;
+  notify();
+  return cache;
+}
+
+// --- 동기 읽기 (캐시 기반) ---
+export function getProgress(): StageProgress {
+  return cache;
 }
 
 export function getBestScore(stageId: string): number {
-  return getProgress().bestScores[stageId] ?? 0;
-}
-
-export function recordBestScore(stageId: string, score: number): StageProgress {
-  const current = getProgress();
-  const prevBest = current.bestScores[stageId] ?? 0;
-  if (score <= prevBest) return current;
-
-  const updated: StageProgress = {
-    ...current,
-    bestScores: { ...current.bestScores, [stageId]: score },
-  };
-  setData(KEY, updated);
-  return updated;
+  return cache.bestScores[stageId] ?? 0;
 }
 
 export function getCumulativeScore(): number {
-  return getProgress().cumulativeScore ?? 0;
+  return cache.cumulativeScore ?? 0;
 }
 
-export function addCumulativeScore(amount: number): StageProgress {
-  const current = getProgress();
-  const updated: StageProgress = {
-    ...current,
-    cumulativeScore: (current.cumulativeScore ?? 0) + amount,
+// --- 변경 (캐시 낙관적 갱신 + Firestore 쓰기) ---
+export async function markCleared(stageId: string): Promise<void> {
+  if (cache.clearedStageIds.includes(stageId)) return;
+  cache = {
+    ...cache,
+    clearedStageIds: [...cache.clearedStageIds, stageId],
   };
-  setData(KEY, updated);
-  return updated;
+  notify();
+  const uid = await ensureAuth();
+  await setDoc(
+    progressRef(uid),
+    { clearedStageIds: arrayUnion(stageId) },
+    { merge: true },
+  );
 }
 
-export function incrementAttemptCount(stageId: string): StageProgress {
-  const current = getProgress();
-  const prevCount = current.attemptCounts[stageId] ?? 0;
-
-  const updated: StageProgress = {
-    ...current,
-    attemptCounts: { ...current.attemptCounts, [stageId]: prevCount + 1 },
+export async function recordBestScore(
+  stageId: string,
+  score: number,
+): Promise<void> {
+  const prev = cache.bestScores[stageId] ?? 0;
+  if (score <= prev) return;
+  cache = {
+    ...cache,
+    bestScores: { ...cache.bestScores, [stageId]: score },
   };
-  setData(KEY, updated);
-  return updated;
+  notify();
+  const uid = await ensureAuth();
+  await setDoc(
+    progressRef(uid),
+    { bestScores: { [stageId]: score } },
+    { merge: true },
+  );
+}
+
+export async function addCumulativeScore(amount: number): Promise<void> {
+  cache = {
+    ...cache,
+    cumulativeScore: (cache.cumulativeScore ?? 0) + amount,
+  };
+  notify();
+  const uid = await ensureAuth();
+  await setDoc(
+    progressRef(uid),
+    { cumulativeScore: increment(amount) },
+    { merge: true },
+  );
+}
+
+export async function incrementAttemptCount(stageId: string): Promise<void> {
+  const prev = cache.attemptCounts[stageId] ?? 0;
+  cache = {
+    ...cache,
+    attemptCounts: { ...cache.attemptCounts, [stageId]: prev + 1 },
+  };
+  notify();
+  const uid = await ensureAuth();
+  await setDoc(
+    progressRef(uid),
+    { attemptCounts: { [stageId]: increment(1) } },
+    { merge: true },
+  );
+}
+
+/** 진행도 초기화 — 캐시·서버 문서 모두 제거 */
+export async function clearProgress(): Promise<void> {
+  cache = DEFAULT_PROGRESS;
+  notify();
+  const uid = await ensureAuth();
+  await deleteDoc(progressRef(uid));
 }

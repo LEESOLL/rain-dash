@@ -3,41 +3,13 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { GameButton } from "@/components/GameButton";
 import { StageMap } from "@/features/stage/components/StageMap";
-import { getProgress } from "@/features/stage/stageProgressRepository";
+import {
+  fetchProgress,
+  getCachedProgress,
+  getServerProgressSnapshot,
+  subscribeProgress,
+} from "@/features/stage/stageProgressRepository";
 import { getBundles } from "@/features/stage/stageRepository";
-import type { StageProgress } from "@/features/stage/types";
-
-const DEFAULT_PROGRESS: StageProgress = {
-  clearedStageIds: [],
-  bestScores: {},
-  attemptCounts: {},
-  cumulativeScore: 0,
-};
-
-let cachedProgress: StageProgress | undefined;
-const progressListeners = new Set<() => void>();
-
-function readProgress(): StageProgress {
-  if (typeof window === "undefined") return DEFAULT_PROGRESS;
-  if (!cachedProgress) cachedProgress = getProgress();
-  return cachedProgress;
-}
-
-function subscribeProgress(cb: () => void): () => void {
-  progressListeners.add(cb);
-  return () => {
-    progressListeners.delete(cb);
-  };
-}
-
-function refreshProgress() {
-  cachedProgress = undefined;
-  for (const l of progressListeners) l();
-}
-
-function getServerProgressSnapshot(): StageProgress {
-  return DEFAULT_PROGRESS;
-}
 
 type Props = {
   onClose: () => void;
@@ -47,10 +19,19 @@ export function StageModal({ onClose }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    refreshProgress();
+    fetchProgress().catch((e) => console.error("progress fetch failed", e));
+  }, []);
+
+  const progress = useSyncExternalStore(
+    subscribeProgress,
+    getCachedProgress,
+    getServerProgressSnapshot,
+  );
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root) return;
     requestAnimationFrame(() => {
-      const root = scrollRef.current;
-      if (!root) return;
       const current = root.querySelector('[data-stage-status="current"]');
       if (current) {
         current.scrollIntoView({ block: "center" });
@@ -63,13 +44,7 @@ export function StageModal({ onClose }: Props) {
       }
       root.scrollTo({ top: root.scrollHeight });
     });
-  }, []);
-
-  const progress = useSyncExternalStore(
-    subscribeProgress,
-    readProgress,
-    getServerProgressSnapshot,
-  );
+  }, [progress]);
 
   const bundles = getBundles();
 
