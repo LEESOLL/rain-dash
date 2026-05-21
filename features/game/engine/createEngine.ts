@@ -194,15 +194,25 @@ export function createEngine(config: EngineConfig): Engine {
             mctx.drawImage(img, 0, 0);
             const data = mctx.getImageData(0, 0, master.width, master.height);
             const px = data.data;
-            for(let i = 0; i < px.length; i += 4){
-                const r = px[i];
-                const g = px[i + 1];
-                const b = px[i + 2];
-                if (g > 100 && g > r * 1.2 && g > b * 1.2) {
-                    px[i + 3] = 0;
+            // 이미 투명 픽셀이 있으면 배경이 제거된 이미지 → 크로마키 생략
+            let hasTransparent = false;
+            for(let i = 3; i < px.length; i += 4){
+                if (px[i] === 0) {
+                    hasTransparent = true;
+                    break;
                 }
             }
-            mctx.putImageData(data, 0, 0);
+            if (!hasTransparent) {
+                for(let i = 0; i < px.length; i += 4){
+                    const r = px[i];
+                    const g = px[i + 1];
+                    const b = px[i + 2];
+                    if (g > 100 && g > r * 1.2 && g > b * 1.2) {
+                        px[i + 3] = 0;
+                    }
+                }
+                mctx.putImageData(data, 0, 0);
+            }
             const rawW = Math.floor(master.width / frameCount);
             const rawH = master.height;
             const rawFrames: HTMLCanvasElement[] = [];
