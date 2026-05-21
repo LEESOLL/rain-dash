@@ -43,9 +43,16 @@ function NicknameModalContent({
     <Modal
       isOpen={true}
       onClose={onClose}
+      align="top"
       panelClassName="rounded-2xl border-2 border-white bg-white/90 backdrop-blur-md shadow-xl"
     >
-      <div className="flex flex-col items-center gap-6 text-sky-900">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+        className="flex flex-col items-center gap-6 text-sky-900"
+      >
         <div className="text-center">
           <h2 className="mb-1 text-xl font-bold tracking-widest text-sky-400">
             닉네임 입력
@@ -62,18 +69,19 @@ function NicknameModalContent({
           placeholder="Dasher_XXXX"
           maxLength={20}
           autoFocus
+          enterKeyHint="done"
           className="w-full rounded-2xl border-2 border-sky-200 bg-white px-4 py-2.5 text-center text-sky-900 outline-none transition placeholder:text-sky-300 focus:border-sky-400"
         />
 
         <div className="flex gap-3">
-          <GameButton size="md" variant="primary" onClick={handleSave}>
+          <GameButton size="md" variant="primary" type="submit">
             확인
           </GameButton>
           <GameButton size="md" variant="light" onClick={handleSkip}>
             건너뛰기
           </GameButton>
         </div>
-      </div>
+      </form>
     </Modal>
   );
 }

@@ -15,6 +15,7 @@ type Props = {
   onMouseLeave?: () => void;
   href?: string;
   className?: string;
+  type?: "button" | "submit";
 };
 
 const base =
@@ -45,6 +46,7 @@ export function GameButton({
   onMouseLeave,
   href,
   className = "",
+  type = "button",
 }: Props) {
   const cls = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
   function handleClick() {
@@ -59,7 +61,12 @@ export function GameButton({
     );
   }
   return (
-    <button onClick={handleClick} onMouseLeave={onMouseLeave} className={cls}>
+    <button
+      type={type}
+      onClick={handleClick}
+      onMouseLeave={onMouseLeave}
+      className={cls}
+    >
       {children}
     </button>
   );
