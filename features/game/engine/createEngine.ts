@@ -542,7 +542,7 @@ export function createEngine(config: EngineConfig): Engine {
     state.px += vx * dt;
     runDist += Math.abs(vx) * dt;
     const desiredCam =
-      state.px - T["VIEWPORT_WIDTH"] * T["PLAYER_SCREEN_LIMIT_RATIO"];
+      state.px - canvas.width * T["PLAYER_SCREEN_LIMIT_RATIO"];
     if (desiredCam > state.cam) state.cam = desiredCam;
     if (state.px < state.cam) state.px = state.cam;
     if (state.px < 0) state.px = 0;
@@ -599,7 +599,7 @@ export function createEngine(config: EngineConfig): Engine {
     while (spawnAcc >= 1) {
       spawnAcc -= 1;
       const spawnX =
-        state.cam - 40 + Math.random() * (T["VIEWPORT_WIDTH"] + 160);
+        state.cam - 40 + Math.random() * (canvas.width + 160);
       state.drops.push({
         x: spawnX,
         y: -40,
@@ -654,7 +654,7 @@ export function createEngine(config: EngineConfig): Engine {
           (Math.random() - 0.5) * 2 * T["LIGHTNING_PLAYER_BIAS_RADIUS"];
         const minX = state.cam + T["LIGHTNING_SPAWN_MARGIN"];
         const maxX =
-          state.cam + T["VIEWPORT_WIDTH"] - T["LIGHTNING_SPAWN_MARGIN"];
+          state.cam + canvas.width - T["LIGHTNING_SPAWN_MARGIN"];
         const spawnX = Math.max(minX, Math.min(maxX, desiredX));
         state.lightnings.push({
           x: spawnX,

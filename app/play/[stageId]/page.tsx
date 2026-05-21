@@ -15,13 +15,8 @@ export default async function PlayPage({
   }
 
   return (
-    <main className="min-h-dvh bg-black flex items-center justify-center">
-      <div
-        className="aspect-video"
-        style={{ width: "min(100vw, calc(100vh * 16 / 9))" }}
-      >
-        <GameCanvas stage={stage} />
-      </div>
+    <main className="h-dvh w-screen overflow-hidden bg-black">
+      <GameCanvas stage={stage} />
     </main>
   );
 }

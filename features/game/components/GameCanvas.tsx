@@ -11,7 +11,7 @@ import { useIsTouch } from "@/lib/touch";
 import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
-import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
+import { VIEWPORT_HEIGHT } from "../engine/tuning";
 import type { Engine, GameStatus } from "../engine/types";
 
 type Props = {
@@ -133,12 +133,33 @@ export function GameCanvas({ stage }: Props) {
     }
   }, [status]);
 
+  // 캔버스 내부 해상도를 화면 비율에 맞춤 — 세로 720 고정, 가로는 비율대로
+  // (양옆 레터박스 없이 꽉 차게, 넓은 화면은 더 넓은 시야를 보여줌)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    function resize() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      canvas.height = VIEWPORT_HEIGHT;
+      canvas.width = Math.max(
+        1,
+        Math.round(VIEWPORT_HEIGHT * (rect.width / rect.height)),
+      );
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", resize);
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("orientationchange", resize);
+    };
+  }, []);
 
-    canvas.width = VIEWPORT_WIDTH;
-    canvas.height = VIEWPORT_HEIGHT;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     const engine = createEngine({
       canvas,
