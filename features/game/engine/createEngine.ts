@@ -857,20 +857,16 @@ export function createEngine(config: EngineConfig): Engine {
         const blinkHz = 3 + progress * 18;
         const visible = Math.floor(state.realT * blinkHz) % 2 === 0;
         if (visible) {
-          ctx.fillStyle = "rgba(255,200,0,0.7)";
-          ctx.fillRect(
-            sx - T["LIGHTNING_WIDTH"] / 2,
-            T["GROUND_Y"] - 4,
-            T["LIGHTNING_WIDTH"],
-            8,
-          );
-          ctx.fillStyle = "rgba(255,80,0,0.9)";
-          ctx.fillRect(
-            sx - T["LIGHTNING_WIDTH"] / 2,
-            T["GROUND_Y"] - 6,
-            T["LIGHTNING_WIDTH"],
-            2,
-          );
+          const w = T["LIGHTNING_WIDTH"];
+          // 빨간 경고 타원 (바닥)
+          ctx.fillStyle = "rgba(255,60,50,0.35)";
+          ctx.beginPath();
+          ctx.ellipse(sx, T["GROUND_Y"], w * 1.1, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255,90,70,0.9)";
+          ctx.beginPath();
+          ctx.ellipse(sx, T["GROUND_Y"], w * 0.6, 7, 0, 0, Math.PI * 2);
+          ctx.fill();
         }
       } else if (ev.phase === "strike") {
         const strikeProgress = 1 - ev.t / T["LIGHTNING_STRIKE_DURATION"];
@@ -892,18 +888,20 @@ export function createEngine(config: EngineConfig): Engine {
           );
         }
       } else {
-        if (thunderFrames.length > 0) {
-          const alpha = Math.max(0, ev.t / T["LIGHTNING_LINGER_DURATION"]);
-          ctx.globalAlpha = alpha;
-          ctx.drawImage(
-            thunderFrames[0],
-            Math.round(sx - T["LIGHTNING_WIDTH"] / 2),
-            0,
-            T["LIGHTNING_WIDTH"],
-            T["GROUND_Y"],
-          );
-          ctx.globalAlpha = 1;
-        }
+        // 번개가 내려온 뒤: 바닥에 잔광색 타원만 반짝거리며 잦아듦
+        const w = T["LIGHTNING_WIDTH"];
+        const p = Math.max(0, ev.t / T["LIGHTNING_LINGER_DURATION"]); // 1 → 0
+        const blink = Math.floor(state.realT * 28) % 2 === 0 ? 1 : 0.45;
+        const a = p * blink;
+        // 잔광색 타원 (전기 옐로우-화이트)
+        ctx.fillStyle = `rgba(255,240,170,${a * 0.4})`;
+        ctx.beginPath();
+        ctx.ellipse(sx, T["GROUND_Y"], w * 1.2, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(255,250,215,${a * 0.9})`;
+        ctx.beginPath();
+        ctx.ellipse(sx, T["GROUND_Y"], w * 0.65, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
     const screenX = state.px - cam;
