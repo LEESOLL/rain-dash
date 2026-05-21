@@ -61,26 +61,20 @@ export default function RankingsPage() {
         </h1>
 
         <div className="mb-6 flex gap-2">
-          <button
+          <GameButton
+            size="sm"
+            variant={tab === "cumulative" ? "primary" : "secondary"}
             onClick={() => setTab("cumulative")}
-            className={`rounded-2xl border-2 px-5 py-2 text-sm font-bold backdrop-blur transition ${
-              tab === "cumulative"
-                ? "border-white/70 bg-sky-400/90 text-white shadow-md shadow-sky-900/30"
-                : "border-white/40 bg-white/15 text-white hover:bg-white/30"
-            }`}
           >
             누적점수
-          </button>
-          <button
+          </GameButton>
+          <GameButton
+            size="sm"
+            variant={tab === "theme" ? "primary" : "secondary"}
             onClick={() => setTab("theme")}
-            className={`rounded-2xl border-2 px-5 py-2 text-sm font-bold backdrop-blur transition ${
-              tab === "theme"
-                ? "border-white/70 bg-sky-400/90 text-white shadow-md shadow-sky-900/30"
-                : "border-white/40 bg-white/15 text-white hover:bg-white/30"
-            }`}
           >
             테마별 랭킹
-          </button>
+          </GameButton>
         </div>
 
         <div className="w-full max-w-md">

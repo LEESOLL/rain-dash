@@ -69,12 +69,9 @@ function NicknameModalContent({
           <GameButton size="md" variant="primary" onClick={handleSave}>
             확인
           </GameButton>
-          <button
-            onClick={handleSkip}
-            className="rounded-2xl border-2 border-sky-300 bg-sky-50 px-8 py-[clamp(0.5rem,1.5vh,0.7rem)] text-base font-bold text-sky-600 transition hover:bg-sky-100 active:scale-95"
-          >
+          <GameButton size="md" variant="light" onClick={handleSkip}>
             건너뛰기
-          </button>
+          </GameButton>
         </div>
       </div>
     </Modal>

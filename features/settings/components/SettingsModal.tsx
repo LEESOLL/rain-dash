@@ -8,6 +8,7 @@ import {
   setSoundEnabled,
 } from "@/features/settings/settingsRepository";
 import { refreshUserCache } from "@/features/user/userStore";
+import { GameButton } from "@/components/GameButton";
 import { Modal } from "@/components/Modal";
 
 type Props = {
@@ -51,16 +52,14 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
 
         <div className="flex items-center justify-between">
           <span className="text-sm">사운드</span>
-          <button
+          <GameButton
+            size="sm"
+            variant={sound ? "primary" : "secondary"}
+            className="w-20"
             onClick={handleSoundToggle}
-            className={`w-20 rounded px-4 py-1 text-sm font-bold transition ${
-              sound
-                ? "bg-white text-black hover:bg-white/80"
-                : "border border-white/30 text-white/70 hover:bg-white/10"
-            }`}
           >
             {sound ? "ON" : "OFF"}
-          </button>
+          </GameButton>
         </div>
 
         <div className="flex items-center justify-between">
@@ -70,26 +69,20 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
               닉네임 · 점수 · 베스트 기록 모두 삭제
             </span>
           </div>
-          <button
+          <GameButton
+            size="sm"
+            variant={confirmReset ? "danger" : "secondary"}
             onClick={handleReset}
             onMouseLeave={() => setConfirmReset(false)}
-            className={`rounded px-4 py-1 text-sm font-bold transition ${
-              confirmReset
-                ? "bg-red-500 text-white hover:bg-red-600"
-                : "border border-red-500/50 text-red-300 hover:bg-red-500/10"
-            }`}
           >
             {confirmReset ? "정말 삭제?" : "초기화"}
-          </button>
+          </GameButton>
         </div>
 
         <div className="flex justify-center pt-2">
-          <button
-            onClick={onClose}
-            className="rounded border border-white/30 px-6 py-2 text-sm transition hover:bg-white/10"
-          >
+          <GameButton size="md" onClick={onClose}>
             닫기
-          </button>
+          </GameButton>
         </div>
       </div>
     </Modal>
