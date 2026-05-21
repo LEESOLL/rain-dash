@@ -6,6 +6,7 @@ import { GameButton } from "@/components/GameButton";
 import { submitMyScore } from "@/features/ranking/rankingRepository";
 import { fetchProgress } from "@/features/stage/stageProgressRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
+import { useIsPortrait } from "@/lib/orientation";
 import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
@@ -21,8 +22,16 @@ export function GameCanvas({ stage }: Props) {
   const engineRef = useRef<Engine | null>(null);
   const router = useRouter();
   const [status, setStatus] = useState<GameStatus>("playing");
+  const [manualPaused, setManualPaused] = useState(false);
+  const portrait = useIsPortrait();
+  const paused = portrait || manualPaused;
+  const pausedRef = useRef(paused);
 
   const nextStageId = getNextStageId(stage);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   useEffect(() => {
     fetchProgress().catch((e) => console.error("progress fetch failed", e));
@@ -30,17 +39,25 @@ export function GameCanvas({ stage }: Props) {
   }, []);
 
   useEffect(() => {
+    engineRef.current?.setPaused(paused);
+  }, [paused]);
+
+  useEffect(() => {
     if (status === "playing") {
       playBgm("/audio/gaming_bgm.mp3", 0.4);
-    } else if (status === "dead") {
+    } else {
       stopBgm();
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (status === "dead") {
       if (isAudioEnabled()) {
         const audio = new Audio("/audio/game_over.mp3");
         audio.volume = 0.6;
         audio.play().catch(() => {});
       }
     } else if (status === "won") {
-      stopBgm();
       submitMyScore(stage.bundleId).catch((e) =>
         console.error("score submit failed", e),
       );
@@ -78,6 +95,7 @@ export function GameCanvas({ stage }: Props) {
     engineRef.current = engine;
     setStatus("playing");
     engine.start();
+    engine.setPaused(pausedRef.current);
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.code === "ArrowLeft" || e.code === "KeyA") {
@@ -142,10 +160,39 @@ export function GameCanvas({ stage }: Props) {
 
   const showNext = status === "won" && nextStageId !== null;
   const retryIsPrimary = !showNext;
+  const showPauseButton = status === "playing" && !manualPaused && !portrait;
+  const showPauseOverlay = manualPaused && !portrait;
 
   return (
     <div className="relative h-full w-full">
       <canvas ref={canvasRef} className="block h-full w-full" />
+
+      {showPauseButton && (
+        <div className="absolute right-4 top-4 z-10">
+          <GameButton size="sm" onClick={() => setManualPaused(true)}>
+            일시정지
+          </GameButton>
+        </div>
+      )}
+
+      {showPauseOverlay && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/55 font-mono text-white">
+          <h2 className="text-2xl font-bold tracking-widest">일시정지</h2>
+          <div className="flex gap-3">
+            <GameButton size="md" onClick={handleExit}>
+              나가기
+            </GameButton>
+            <GameButton
+              size="md"
+              variant="primary"
+              onClick={() => setManualPaused(false)}
+            >
+              재개
+            </GameButton>
+          </div>
+        </div>
+      )}
+
       {status !== "playing" && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[10%] z-10 flex justify-center">
           <div className="pointer-events-auto flex gap-3">

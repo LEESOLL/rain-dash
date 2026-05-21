@@ -1214,12 +1214,16 @@ export function createEngine(config: EngineConfig): Engine {
       ctx.restore();
     }
   }
+  let paused = false;
   function loop(now: number) {
     if (raf === null) return;
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     if (!assetsReady) {
       drawLoading();
+    } else if (paused) {
+      // 일시정지: 진행은 멈추고 현재 프레임만 유지
+      draw();
     } else {
       step(dt);
       draw();
@@ -1251,6 +1255,9 @@ export function createEngine(config: EngineConfig): Engine {
       prevJump = false;
       prevPxScore = state.px;
       winStartT = null;
+    },
+    setPaused(p: boolean) {
+      paused = p;
     },
   };
 }

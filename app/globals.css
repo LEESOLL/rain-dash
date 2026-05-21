@@ -66,3 +66,18 @@ img[data-pixel] {
   animation: bg-slide 50s linear infinite;
   will-change: transform;
 }
+
+@keyframes rotate-hint {
+  0%,
+  35% {
+    transform: rotate(0deg);
+  }
+  65%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+.animate-rotate-hint {
+  animation: rotate-hint 1.8s ease-in-out infinite;
+}

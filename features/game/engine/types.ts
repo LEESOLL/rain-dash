@@ -123,4 +123,5 @@ export type Engine = {
   setInput: (partial: Partial<Input>) => void;
   getState: () => GameState;
   restart: () => void;
+  setPaused: (paused: boolean) => void;
 };
