@@ -6,6 +6,7 @@ import {
   getServerRankingSnapshot,
   readBundleRanking,
   readCumulativeRanking,
+  refreshBundleRanking,
   refreshRanking,
   subscribeRanking,
 } from "@/features/ranking/rankingStore";
@@ -21,6 +22,10 @@ export default function RankingsPage() {
   useEffect(() => {
     refreshRanking();
   }, []);
+
+  useEffect(() => {
+    refreshBundleRanking(bundleId);
+  }, [bundleId]);
 
   const cumulative = useSyncExternalStore(
     subscribeRanking,

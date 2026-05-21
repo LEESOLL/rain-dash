@@ -1,14 +1,23 @@
-import { doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
   getCumulativeScore,
   getProgress,
 } from "@/features/stage/stageProgressRepository";
 import { getBundle } from "@/features/stage/stageRepository";
-import { ensureAuth } from "@/features/user/authRepository";
+import { ensureAuth, getCurrentUid } from "@/features/user/authRepository";
 import { getUser } from "@/features/user/userRepository";
-import { MOCK_USERS } from "./mockData";
 import type { RankEntry } from "./types";
+
+const TOP_LIMIT = 50;
 
 function bundleScoreSum(bundleId: string): number {
   const bundle = getBundle(bundleId);
@@ -37,52 +46,43 @@ export async function submitMyScore(bundleId: string): Promise<void> {
   );
 }
 
-export function getCumulativeRanking(): RankEntry[] {
-  const me = getUser();
-  const myScore = getCumulativeScore();
-
-  const entries: RankEntry[] = MOCK_USERS.map((u) => ({
-    nickname: u.nickname,
-    score: u.cumulativeScore,
-    isMe: false,
-  }));
-
-  if (me) {
-    entries.push({
-      nickname: me.nickname,
-      score: myScore,
-      isMe: true,
-    });
-  }
-
-  return entries.sort((a, b) => b.score - a.score);
+export async function fetchCumulativeRanking(): Promise<RankEntry[]> {
+  const myUid = getCurrentUid();
+  const q = query(
+    collection(db, "rankings"),
+    orderBy("cumulativeScore", "desc"),
+    limit(TOP_LIMIT),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      nickname: (data.nickname as string) ?? "익명이",
+      score: (data.cumulativeScore as number) ?? 0,
+      isMe: d.id === myUid,
+    };
+  });
 }
 
-export function getBundleRanking(bundleId: string): RankEntry[] {
-  const me = getUser();
-  const progress = getProgress();
-  const bundle = getBundle(bundleId);
-
-  const myBundleScore = bundle
-    ? bundle.stageIds.reduce(
-        (sum, sid) => sum + (progress.bestScores[sid] ?? 0),
-        0,
-      )
-    : 0;
-
-  const entries: RankEntry[] = MOCK_USERS.map((u) => ({
-    nickname: u.nickname,
-    score: u.bundleScores[bundleId] ?? 0,
-    isMe: false,
-  })).filter((e) => e.score > 0);
-
-  if (me) {
-    entries.push({
-      nickname: me.nickname,
-      score: myBundleScore,
-      isMe: true,
-    });
-  }
-
-  return entries.sort((a, b) => b.score - a.score);
+export async function fetchBundleRanking(
+  bundleId: string,
+): Promise<RankEntry[]> {
+  const myUid = getCurrentUid();
+  const q = query(
+    collection(db, "rankings"),
+    orderBy(`bundleScores.${bundleId}`, "desc"),
+    limit(TOP_LIMIT),
+  );
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((d) => {
+      const data = d.data();
+      const score = (data.bundleScores?.[bundleId] as number) ?? 0;
+      return {
+        nickname: (data.nickname as string) ?? "?",
+        score,
+        isMe: d.id === myUid,
+      };
+    })
+    .filter((e) => e.score > 0);
 }
