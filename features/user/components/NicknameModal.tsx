@@ -77,7 +77,7 @@ function NicknameModalContent({
           <GameButton size="md" variant="primary" type="submit">
             확인
           </GameButton>
-          <GameButton size="md" variant="light" onClick={handleSkip}>
+          <GameButton size="md" variant="ghost" onClick={handleSkip}>
             건너뛰기
           </GameButton>
         </div>

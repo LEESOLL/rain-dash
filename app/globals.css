@@ -19,7 +19,8 @@
   font-display: swap;
 }
 
-@theme {
+/* static — 색 토큰을 var()로 직접 참조하므로 트리쉐이킹 없이 전부 :root에 출력 */
+@theme static {
   --font-sans: "PF Stardust", sans-serif;
   --font-mono: "PF Stardust", sans-serif;
 
@@ -141,4 +142,485 @@ img[data-pixel] {
 
 .animate-rotate-hint {
   animation: rotate-hint 1.8s ease-in-out infinite;
+}
+
+/* =========================================================
+   디자인 시스템 컴포넌트 (vivid #00BCFE + PF Stardust)
+   ========================================================= */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 12px 22px;
+  border: 2px solid #ffffff;
+  border-radius: var(--r-md);
+  font-family: "PF Stardust", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  line-height: 1;
+  user-select: none;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 120ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    color 120ms ease;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: saturate(0.6);
+  transform: none !important;
+}
+.btn--primary {
+  background: var(--color-sky-400);
+  color: #fff;
+  box-shadow: var(--shadow-primary);
+}
+.btn--primary:hover {
+  background: var(--color-sky-500);
+}
+.btn--primary:active {
+  background: var(--color-sky-600);
+}
+.btn--secondary {
+  background: var(--glass-55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--color-sky-800);
+}
+.btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.82);
+}
+.btn--secondary:active {
+  background: rgba(255, 255, 255, 0.92);
+}
+.btn--ghost {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--color-sky-700);
+}
+.btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+.btn--ghost:active {
+  background: rgba(255, 255, 255, 0.65);
+}
+.btn--danger {
+  background: var(--color-danger-400);
+  color: #fff;
+  box-shadow: var(--shadow-danger);
+}
+.btn--danger:hover {
+  background: var(--color-danger-500);
+}
+.btn--danger:active {
+  background: var(--color-danger-600);
+}
+.btn--sm {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: var(--r-sm);
+}
+.btn--lg {
+  min-height: 60px;
+  font-size: 18px;
+  border-radius: var(--r-lg);
+}
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+/* ---------- Modal ---------- */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: var(--glass-80);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  backdrop-filter: blur(20px) saturate(1.1);
+  border: 3px solid #ffffff;
+  border-radius: 26px;
+  box-shadow:
+    0 0 0 1px var(--line-soft),
+    var(--shadow-3);
+  overflow: hidden;
+}
+.modal__header {
+  position: relative;
+  padding: 26px 28px 18px;
+  text-align: center;
+}
+.modal__title {
+  margin: 0;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-strong);
+  letter-spacing: 1px;
+}
+.modal__sub {
+  margin: 6px 0 0;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+.modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px var(--line-mid);
+  border: none;
+  display: grid;
+  place-items: center;
+  color: var(--text-body);
+  font-family: "PF Stardust", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+}
+.modal__close:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-strong);
+}
+.modal__body {
+  padding: 6px 28px 8px;
+  color: var(--text-body);
+  font-family: "PF Stardust", sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.modal__footer {
+  padding: 18px 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal__footer--row {
+  flex-direction: row;
+}
+.modal__footer--row > * {
+  flex: 1;
+}
+
+/* ---------- Select ---------- */
+.select {
+  position: relative;
+  width: 100%;
+  font-family: "PF Stardust", sans-serif;
+}
+.select__control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line-mid);
+  border-radius: var(--r-md);
+  color: var(--text-strong);
+  font-size: 14px;
+  min-height: 46px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+.select__control:hover {
+  background: rgba(255, 255, 255, 0.88);
+}
+.select--open .select__control {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--color-sky-500);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+.select__caret {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--color-sky-700);
+  border-bottom: 2px solid var(--color-sky-700);
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 200ms ease;
+}
+.select--open .select__caret {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+.select__menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-sky-500);
+  border-top: none;
+  box-shadow: var(--shadow-2);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  overflow: hidden;
+  z-index: 5;
+  padding: 4px;
+}
+.select__option {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-body);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+.select__option:hover {
+  background: var(--color-sky-100);
+  color: var(--text-strong);
+}
+.select__option--selected {
+  background: var(--color-sky-200);
+  color: var(--text-strong);
+}
+
+/* ---------- Tabs (segmented) ---------- */
+.tabs {
+  display: flex;
+  gap: 0;
+  background: var(--glass-55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-pill);
+  padding: 4px;
+  font-family: "PF Stardust", sans-serif;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-radius: var(--r-pill);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+.tab:hover {
+  color: var(--text-body);
+}
+.tab.is-active {
+  background: var(--color-sky-400);
+  color: #fff;
+}
+
+/* ---------- Pill tabs (chunky, freestanding) ---------- */
+.pill-tabs {
+  display: flex;
+  gap: 10px;
+}
+.pill-tab {
+  font-family: "PF Stardust", sans-serif;
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: var(--r-pill);
+  border: 2px solid #ffffff;
+  background: rgba(255, 255, 255, 0.32);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+.pill-tab.is-active {
+  background: var(--color-sky-400);
+  color: #fff;
+}
+
+/* ---------- Toggle (switch) ---------- */
+.toggle {
+  width: 56px;
+  height: 30px;
+  background: var(--line-mid);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 200ms ease;
+  flex-shrink: 0;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(11, 58, 82, 0.25);
+  transition: left 200ms ease;
+}
+.toggle.is-on {
+  background: var(--color-sky-400);
+}
+.toggle.is-on::after {
+  left: 29px;
+}
+
+/* ---------- ON/OFF toggle button ---------- */
+.btn-toggle {
+  font-family: "PF Stardust", sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  min-width: 84px;
+  min-height: 40px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  outline: 1px solid var(--line-mid);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    outline-color 160ms ease;
+}
+.btn-toggle.is-on {
+  background: var(--color-sky-400);
+  color: #fff;
+  outline-color: rgba(0, 188, 254, 0.5);
+}
+.btn-toggle.is-off {
+  background: #fff;
+  color: var(--text-muted);
+}
+.btn-toggle.is-off:hover {
+  color: var(--color-sky-700);
+  outline-color: var(--color-sky-300);
+}
+
+/* ---------- Text input ---------- */
+.text-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: #fff;
+  border: 2px solid var(--color-sky-400);
+  border-radius: 14px;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 16px;
+  color: var(--text-strong);
+  outline: none;
+  letter-spacing: 1px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.text-input::placeholder {
+  color: var(--color-sky-300);
+}
+.text-input:focus {
+  border-color: var(--color-sky-500);
+  box-shadow: 0 0 0 4px rgba(0, 188, 254, 0.12);
+}
+
+/* ---------- Setting row ---------- */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line-soft);
+  gap: 14px;
+}
+.setting-row:last-child {
+  border-bottom: none;
+}
+.setting-row__label {
+  color: var(--text-strong);
+  font-size: 14px;
+  font-family: "PF Stardust", sans-serif;
+}
+.setting-row__hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- Rank item ---------- */
+.rank-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rank-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.42);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  font-family: "PF Stardust", sans-serif;
+}
+.rank-item__no {
+  font-family: "PF Stardust", sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 1px;
+}
+.rank-item__name {
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+.rank-item__score {
+  font-family: "PF Stardust", sans-serif;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+.rank-item--me {
+  background: rgba(0, 188, 254, 0.36);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 18px -6px rgba(0, 188, 254, 0.5);
+}
+.me-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  background: var(--color-sky-400);
+  border: 1.5px solid #fff;
+  border-radius: 8px;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: 1.5px;
 }

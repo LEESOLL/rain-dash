@@ -30,7 +30,7 @@ export function AudioPromptModal({ isOpen, onChoose }: Props) {
           <GameButton size="md" variant="primary" onClick={() => onChoose(true)}>
             소리 켜기
           </GameButton>
-          <GameButton size="md" variant="light" onClick={() => onChoose(false)}>
+          <GameButton size="md" variant="ghost" onClick={() => onChoose(false)}>
             소리 끄기
           </GameButton>
         </div>
