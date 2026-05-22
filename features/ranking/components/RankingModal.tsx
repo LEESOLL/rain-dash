@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { GameButton } from "@/components/GameButton";
+import { PillTabs } from "@/components/PillTabs";
+import { Select } from "@/components/Select";
 import {
   getServerRankingSnapshot,
   readBundleRanking,
@@ -44,9 +46,13 @@ export function RankingModal({ onClose }: Props) {
   );
 
   const bundles = getBundles();
+  const bundleOptions = bundles.map((b) => ({ value: b.id, label: b.name }));
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/55 font-mono text-white">
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto font-mono text-white"
+      style={{ background: "var(--backdrop)" }}
+    >
       <div className="fixed left-4 top-4 z-[60]">
         <GameButton size="sm" onClick={onClose}>
           ← 메인으로
@@ -54,47 +60,31 @@ export function RankingModal({ onClose }: Props) {
       </div>
 
       <div className="relative flex min-h-dvh flex-col items-center px-4 py-12">
-        <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
+        <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_45%)]">
           랭킹
         </h1>
 
-        <div className="mb-6 flex gap-2">
-          <GameButton
-            size="sm"
-            variant={tab === "cumulative" ? "primary" : "secondary"}
-            onClick={() => setTab("cumulative")}
-          >
-            누적점수
-          </GameButton>
-          <GameButton
-            size="sm"
-            variant={tab === "theme" ? "primary" : "secondary"}
-            onClick={() => setTab("theme")}
-          >
-            테마별 랭킹
-          </GameButton>
+        <div className="mb-6">
+          <PillTabs
+            items={[
+              { value: "cumulative", label: "누적점수" },
+              { value: "theme", label: "테마별 랭킹" },
+            ]}
+            value={tab}
+            onChange={(v) => setTab(v as Tab)}
+          />
         </div>
 
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-2xl">
           {tab === "cumulative" && <RankList entries={cumulative} />}
 
           {tab === "theme" && (
             <div className="flex flex-col gap-4">
-              <select
+              <Select
                 value={bundleId}
-                onChange={(e) => setBundleId(e.target.value)}
-                className="rounded-2xl border-2 border-white/40 bg-white/15 px-4 py-2.5 text-white outline-none backdrop-blur transition focus:border-sky-300"
-              >
-                {bundles.map((b) => (
-                  <option
-                    key={b.id}
-                    value={b.id}
-                    className="bg-black text-white"
-                  >
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+                options={bundleOptions}
+                onChange={setBundleId}
+              />
               <RankList entries={bundleEntries} />
             </div>
           )}
@@ -114,32 +104,20 @@ function RankList({ entries }: { entries: RankEntry[] }) {
   }
 
   return (
-    <ol className="flex flex-col gap-2">
+    <div className="rank-list">
       {entries.map((e, i) => (
-        <li
+        <div
           key={`${e.nickname}-${i}`}
-          className={`flex items-center justify-between rounded-2xl border-2 px-4 py-3 backdrop-blur ${
-            e.isMe
-              ? "border-sky-300/80 bg-sky-400/30"
-              : "border-white/30 bg-white/15"
-          }`}
+          className={`rank-item ${e.isMe ? "rank-item--me" : ""}`}
         >
-          <div className="flex items-center gap-3">
-            <span className="w-10 opacity-50">#{i + 1}</span>
-            <span className={e.isMe ? "font-bold text-white" : "text-white/90"}>
-              {e.nickname}
-            </span>
-            {e.isMe && (
-              <span className="rounded-md bg-white px-1.5 py-0.5 text-[10px] font-bold text-sky-600">
-                ME
-              </span>
-            )}
+          <div className="rank-item__no">#{i + 1}</div>
+          <div className="rank-item__name">
+            {e.nickname}
+            {e.isMe && <span className="me-badge">ME</span>}
           </div>
-          <span className={e.isMe ? "font-bold text-white" : "text-white/80"}>
-            {e.score.toLocaleString()}
-          </span>
-        </li>
+          <div className="rank-item__score">{e.score.toLocaleString()}</div>
+        </div>
       ))}
-    </ol>
+    </div>
   );
 }
