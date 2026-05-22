@@ -22,6 +22,67 @@
 @theme {
   --font-sans: "PF Stardust", sans-serif;
   --font-mono: "PF Stardust", sans-serif;
+
+  /* ── Sky · brand (vivid #00BCFE base) ── */
+  --color-sky-50: #e5f8ff;
+  --color-sky-100: #c9f1fe;
+  --color-sky-200: #99e5fe;
+  --color-sky-300: #5fd4fe;
+  --color-sky-400: #00bcfe; /* primary */
+  --color-sky-500: #00a2e2; /* hover */
+  --color-sky-600: #0086bd; /* pressed */
+  --color-sky-700: #006b97;
+  --color-sky-800: #0f506f;
+  --color-sky-900: #0b3a52; /* text */
+
+  /* ── Accent (vivid pastel) ── */
+  --color-mint: #7deccb; /* success */
+  --color-yellow: #ffd865; /* highlight */
+  --color-pink: #ffa3c0; /* soft */
+  --color-coral: #ff8a8a;
+
+  /* ── Danger ── */
+  --color-danger-100: #ffdada;
+  --color-danger-300: #ffa8a8;
+  --color-danger-400: #ff6b6b; /* danger */
+  --color-danger-500: #ea4848; /* hover */
+  --color-danger-600: #c82f2f; /* pressed */
+}
+
+/* ── 시맨틱 디자인 토큰 (버튼·모달 등 직접 작성 CSS에서 사용) ── */
+:root {
+  /* surfaces */
+  --surface-0: #ffffff;
+  --surface-1: #f5fcff;
+  --surface-2: #e5f6fe; /* card */
+  --glass-55: rgba(255, 255, 255, 0.55); /* glass */
+  --glass-80: rgba(255, 255, 255, 0.8); /* modal */
+  --backdrop: rgba(11, 58, 82, 0.38);
+
+  /* text */
+  --text-strong: #0b3a52; /* title */
+  --text-body: #2f6a8a;
+  --text-muted: #7baac4; /* hint */
+  --text-on-primary: #ffffff;
+
+  /* lines */
+  --line-soft: rgba(0, 188, 254, 0.18);
+  --line-mid: rgba(0, 188, 254, 0.32);
+  --line-glass: rgba(255, 255, 255, 0.72);
+
+  /* radius */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  /* shadows */
+  --shadow-1: 0 4px 14px -4px rgba(0, 134, 189, 0.28);
+  --shadow-2: 0 10px 28px -10px rgba(11, 58, 82, 0.3);
+  --shadow-3: 0 24px 60px -18px rgba(11, 58, 82, 0.35);
+  --shadow-primary: 0 8px 22px -8px rgba(0, 188, 254, 0.55);
+  --shadow-danger: 0 8px 22px -8px rgba(200, 47, 47, 0.45);
 }
 
 html,
