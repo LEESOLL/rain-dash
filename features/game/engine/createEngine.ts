@@ -471,6 +471,21 @@ export function createEngine(config: EngineConfig): Engine {
       state.status = "dead";
     }
   }
+  // 아이템 스프라이트 프레임 비율 — 충돌 박스를 시각 크기와 맞추는 데 사용
+  function itemFrameDims(type: ItemType): [number, number] {
+    if (type === "heart") return [heartFrameW, heartFrameH];
+    if (type === "umbrella") return [umbrellaFrameW, umbrellaFrameH];
+    if (type === "boots") return [bootsFrameW, bootsFrameH];
+    return [raincoatItemFrameW, raincoatItemFrameH];
+  }
+  // 아이템 표시 크기 — 긴 변을 동일 목표에 맞춰(fit) 종류별 크기를 비슷하게
+  function itemDrawSize(type: ItemType): [number, number] {
+    const [fw, fh] = itemFrameDims(type);
+    // 하트만 1배, 나머지는 1.3배 — 긴 변을 목표에 맞춰 fit
+    const target = T["ITEM_SIZE"] * (type === "heart" ? 1 : 1.3);
+    const ratio = fw / fh;
+    return ratio >= 1 ? [target, target / ratio] : [target * ratio, target];
+  }
   function pickupItem(it: Item) {
     playSoundEffect(itemAudio);
     const points = T["ITEM_SCORE"][it.type];
@@ -582,15 +597,17 @@ export function createEngine(config: EngineConfig): Engine {
     }
     for (let i = state.items.length - 1; i >= 0; i--) {
       const it = state.items[i];
-      const itLeft = it.x - T["ITEM_SIZE"] / 2;
-      const itRight = it.x + T["ITEM_SIZE"] / 2;
+      // 충돌 박스를 시각 스프라이트 크기와 일치시킴 (장화처럼 넓은 아이템도 맞게)
+      const [idrawW, idrawH] = itemDrawSize(it.type);
+      const itLeft = it.x - idrawW / 2;
+      const itRight = it.x + idrawW / 2;
       const itBottomY = T["GROUND_Y"] - it.y;
-      const itTopY = itBottomY - T["ITEM_SIZE"];
+      const itTopY = itBottomY - idrawH;
       if (
         state.px + T["PLAYER_WIDTH"] / 2 > itLeft &&
         state.px - T["PLAYER_WIDTH"] / 2 < itRight &&
         T["GROUND_Y"] - state.py > itTopY &&
-        T["GROUND_Y"] - state.py - T["PLAYER_HEIGHT"] < itBottomY
+        T["GROUND_Y"] - state.py - T["PLAYER_HITBOX_HEIGHT"] < itBottomY
       ) {
         pickupItem(it);
         state.items.splice(i, 1);
@@ -609,7 +626,7 @@ export function createEngine(config: EngineConfig): Engine {
     }
     const playerLeft = state.px - T["PLAYER_WIDTH"] / 2;
     const playerRight = state.px + T["PLAYER_WIDTH"] / 2;
-    const playerTopY = T["GROUND_Y"] - state.py - T["PLAYER_HEIGHT"];
+    const playerTopY = T["GROUND_Y"] - state.py - T["PLAYER_HITBOX_HEIGHT"];
     const playerBottomY = T["GROUND_Y"] - state.py;
     for (let i = state.drops.length - 1; i >= 0; i--) {
       const d = state.drops[i];
@@ -760,24 +777,14 @@ export function createEngine(config: EngineConfig): Engine {
       if (sx + T["ITEM_SIZE"] < 0 || sx - T["ITEM_SIZE"] > W) continue;
       const yBottom = T["GROUND_Y"] - it.y;
       let itemFrames = null;
-      let itemFW = 1;
-      let itemFH = 1;
       if (it.type === "heart") {
         itemFrames = heartFrames;
-        itemFW = heartFrameW;
-        itemFH = heartFrameH;
       } else if (it.type === "umbrella") {
         itemFrames = umbrellaFrames;
-        itemFW = umbrellaFrameW;
-        itemFH = umbrellaFrameH;
       } else if (it.type === "boots") {
         itemFrames = bootsFrames;
-        itemFW = bootsFrameW;
-        itemFH = bootsFrameH;
       } else if (it.type === "raincoat") {
         itemFrames = raincoatItemFrames;
-        itemFW = raincoatItemFrameW;
-        itemFH = raincoatItemFrameH;
       }
       if (itemFrames && itemFrames.length > 0) {
         const idx =
@@ -785,8 +792,7 @@ export function createEngine(config: EngineConfig): Engine {
             ? Math.floor(state.realT * ITEM_FPS) % itemFrames.length
             : 0;
         const f = itemFrames[idx];
-        const drawH = T["ITEM_SIZE"] * (it.type === "heart" ? 1 : 1.3);
-        const drawW = (drawH * itemFW) / itemFH;
+        const [drawW, drawH] = itemDrawSize(it.type);
         const drawLeft = Math.round(sx - drawW / 2);
         const drawTop = Math.round(yBottom - drawH);
         ctx.drawImage(f, drawLeft, drawTop, drawW, drawH);

@@ -9,6 +9,8 @@ export const MAX_JUMPS = 2;
 
 export const PLAYER_WIDTH = 26;
 export const PLAYER_HEIGHT = 40;
+// 비·아이템 충돌 판정 높이 — 시각 스프라이트(약 90px)에 맞춰 머리까지 닿게
+export const PLAYER_HITBOX_HEIGHT = 84;
 
 export const STILL_TIME_SCALE = 0.1;
 
