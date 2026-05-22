@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { GameCanvas } from "@/features/game/components/GameCanvas";
+import { StageGate } from "@/features/game/components/StageGate";
 import { getStage } from "@/features/stage/stageRepository";
 
 export default async function PlayPage({
@@ -20,7 +20,7 @@ export default async function PlayPage({
         className="aspect-video"
         style={{ width: "min(100vw, calc(100vh * 16 / 9))" }}
       >
-        <GameCanvas stage={stage} />
+        <StageGate stage={stage} />
       </div>
     </main>
   );

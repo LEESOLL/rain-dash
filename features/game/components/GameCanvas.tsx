@@ -6,6 +6,7 @@ import { GameButton } from "@/components/GameButton";
 import { submitMyScore } from "@/features/ranking/rankingRepository";
 import { fetchProgress } from "@/features/stage/stageProgressRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
+import { setMainView } from "@/lib/mainView";
 import { useIsPortrait } from "@/lib/orientation";
 import { useIsTouch } from "@/lib/touch";
 import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
@@ -174,7 +175,8 @@ export function GameCanvas({ stage }: Props) {
         }
         e.preventDefault();
       } else if (e.code === "Escape") {
-        router.replace("/?view=stage");
+        setMainView("stage");
+        router.replace("/");
         e.preventDefault();
       }
     }
@@ -205,7 +207,8 @@ export function GameCanvas({ stage }: Props) {
   }, [stage, router]);
 
   function handleExit() {
-    router.replace("/?view=stage");
+    setMainView("stage");
+    router.replace("/");
   }
   function handleRetry() {
     engineRef.current?.restart();

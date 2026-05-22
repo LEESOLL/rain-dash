@@ -10,6 +10,7 @@ import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
 import { ensureAuth } from "@/features/user/authRepository";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
 import { readCachedUser } from "@/features/user/userStore";
+import { setMainView, useMainView } from "@/lib/mainView";
 import {
   clearBgm,
   getAudioPref,
@@ -18,18 +19,11 @@ import {
   subscribeAudioPref,
 } from "@/lib/sound";
 
-type View = "stage" | "ranking";
-
 export default function Home() {
   const [nicknameOpen, setNicknameOpen] = useState(false);
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [view, setView] = useState<View | null>(() => {
-    if (typeof window === "undefined") return null;
-    return new URLSearchParams(window.location.search).get("view") === "stage"
-      ? "stage"
-      : null;
-  });
+  const view = useMainView();
 
   const audioPref = useSyncExternalStore(
     subscribeAudioPref,
@@ -47,19 +41,13 @@ export default function Home() {
     return () => clearBgm();
   }, []);
 
-  useEffect(() => {
-    if (window.location.search) {
-      window.history.replaceState(null, "", "/");
-    }
-  }, []);
-
   function handleAudioChoose(enabled: boolean) {
     setAudioPref(enabled);
   }
 
   function handleStart() {
     if (readCachedUser()) {
-      setView("stage");
+      setMainView("stage");
     } else {
       setNicknameOpen(true);
     }
@@ -67,7 +55,7 @@ export default function Home() {
 
   function handleNicknameConfirmed() {
     setNicknameOpen(false);
-    setView("stage");
+    setMainView("stage");
   }
 
   return (
@@ -107,7 +95,7 @@ export default function Home() {
               <GameButton size="md" onClick={() => setHowtoOpen(true)}>
                 게임 방법
               </GameButton>
-              <GameButton size="md" onClick={() => setView("ranking")}>
+              <GameButton size="md" onClick={() => setMainView("ranking")}>
                 랭킹 보기
               </GameButton>
               <GameButton size="md" onClick={() => setSettingsOpen(true)}>
@@ -118,8 +106,8 @@ export default function Home() {
         )}
       </main>
 
-      {view === "stage" && <StageModal onClose={() => setView(null)} />}
-      {view === "ranking" && <RankingModal onClose={() => setView(null)} />}
+      {view === "stage" && <StageModal onClose={() => setMainView(null)} />}
+      {view === "ranking" && <RankingModal onClose={() => setMainView(null)} />}
 
       {(nicknameOpen || howtoOpen) && (
         <div className="fixed left-4 top-4 z-[60]">
