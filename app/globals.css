@@ -881,3 +881,11 @@ a.stage-node--current:hover {
   flex-wrap: wrap;
   justify-content: center;
 }
+.result-sub {
+  margin-top: -12px;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 4px rgba(11, 58, 82, 0.5);
+}

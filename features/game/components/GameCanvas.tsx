@@ -332,6 +332,7 @@ export function GameCanvas({ stage }: Props) {
       {status === "dead" && (
         <div className="result-overlay">
           <h2 className="result-title result-title--over">GAME OVER</h2>
+          <p className="result-sub">비를 너무 많이 맞았어요...</p>
           <div className="result-actions">
             <GameButton size="md" onClick={handleExit}>
               나가기
