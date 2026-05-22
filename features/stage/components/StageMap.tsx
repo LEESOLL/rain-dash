@@ -8,7 +8,7 @@ const PAD_TOP = 60;
 // 맨 위 번들 박스(BOX_TOP_PAD만큼 위로 확장)가 잘리지 않게 상단 여백 확보
 const PAD_BOTTOM = 165;
 const INTRA_GAP = 80;
-const INTER_GAP = 120;
+const INTER_GAP = 140;
 // 박스 상단 라벨 공간(맨 위 노드 위로 확보) — 모든 번들 통일
 const BOX_TOP_PAD = 145;
 const X_CENTER = 0.5;
@@ -96,7 +96,7 @@ export function StageMap({ bundles, progress }: Props) {
             className="stage-band"
             style={{
               top: topY - BOX_TOP_PAD,
-              height: bottomY - topY + BOX_TOP_PAD + 30,
+              height: bottomY - topY + BOX_TOP_PAD + 50,
             }}
           >
             <div className="stage-label-group">
