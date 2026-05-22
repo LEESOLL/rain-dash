@@ -624,3 +624,155 @@ img[data-pixel] {
   color: #fff;
   letter-spacing: 1.5px;
 }
+
+/* ---------- Stage map ---------- */
+/* 번들 묶음 배경 밴드 (통일된 round 직사각, top/height만 인라인) */
+/* z-index 미지정(auto) — stacking context를 안 만들어 자식 라벨이 노드/점선 위로 */
+.stage-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 28px;
+}
+.stage-node {
+  position: absolute;
+  z-index: 2;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  display: grid;
+  place-items: center;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  filter: drop-shadow(0 5px 10px rgba(11, 30, 46, 0.35));
+  transition: transform 200ms ease;
+}
+a.stage-node {
+  cursor: pointer;
+}
+a.stage-node:hover {
+  transform: translate(-50%, -53%) scale(1.05);
+}
+/* 깬 스테이지 — 민트 */
+.stage-node--cleared {
+  background: #6bd6ab;
+  text-shadow: 0 1.5px 0 rgba(20, 110, 80, 0.35);
+}
+/* 아직 깨기 전 — 핑크 */
+.stage-node--locked {
+  background: #ff9bbc;
+  text-shadow: 0 1.5px 0 rgba(180, 60, 100, 0.35);
+}
+/* 준비 중 — 그레이 */
+.stage-node--placeholder {
+  background: #a8b0bb;
+  text-shadow: 0 1.5px 0 rgba(80, 90, 100, 0.4);
+}
+/* 현재 깰 차례 — 옐로우 + 살짝 크게 + 바운스 */
+.stage-node--current {
+  width: 70px;
+  height: 70px;
+  font-size: 22px;
+  background: var(--color-yellow);
+  color: #7a5300;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.6);
+  filter: drop-shadow(0 6px 12px rgba(150, 110, 0, 0.45));
+  animation: stage-bounce 1.6s ease-in-out infinite;
+}
+@keyframes stage-bounce {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, -56%);
+  }
+}
+a.stage-node--current:hover {
+  animation-play-state: paused;
+  transform: translate(-50%, -54%);
+}
+
+/* 번들명 라벨 (회색 반투명 pill) */
+/* 라벨 묶음 — 번들 밴드 상단에 좌측 정렬, gap으로 간격 보장 */
+.stage-label-group {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  pointer-events: none;
+}
+.stage-label {
+  display: inline-block;
+  color: #ffffff;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 0 rgba(11, 30, 46, 0.5);
+  background: rgba(11, 30, 46, 0.4);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+}
+/* COMING SOON (흰 pill) */
+.stage-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-sky-700);
+  font-family: "PF Stardust", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(11, 30, 46, 0.25);
+  white-space: nowrap;
+}
+
+/* ---------- Stage legend (우하단) ---------- */
+.stage-legend {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--glass-55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 14px 16px;
+  z-index: 5;
+}
+.stage-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "PF Stardust", sans-serif;
+  font-size: 13px;
+  color: var(--text-strong);
+}
+.stage-legend__chip {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

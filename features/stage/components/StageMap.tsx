@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment } from "react";
 import type { Bundle, StageProgress } from "../types";
 
 const STAGES_PER_THEME = 3;
 const PAD_TOP = 60;
-const PAD_BOTTOM = 40;
+// 맨 위 번들 박스(BOX_TOP_PAD만큼 위로 확장)가 잘리지 않게 상단 여백 확보
+const PAD_BOTTOM = 165;
 const INTRA_GAP = 80;
-const INTER_GAP = 40;
+const INTER_GAP = 120;
+// 박스 상단 라벨 공간(맨 위 노드 위로 확보) — 모든 번들 통일
+const BOX_TOP_PAD = 145;
 const X_CENTER = 0.5;
 const X_AMP = 0.34;
 
@@ -48,13 +50,7 @@ function buildPath(positions: Position[]): string {
   if (positions.length < 2) return "";
   let d = `M ${positions[0].x * 100} ${positions[0].yPx}`;
   for (let i = 1; i < positions.length; i++) {
-    const prev = positions[i - 1];
-    const curr = positions[i];
-    const cp1x = prev.x + (curr.x - prev.x) * 0.5;
-    const cp1y = prev.yPx;
-    const cp2x = prev.x + (curr.x - prev.x) * 0.5;
-    const cp2y = curr.yPx;
-    d += ` C ${cp1x * 100} ${cp1y}, ${cp2x * 100} ${cp2y}, ${curr.x * 100} ${curr.yPx}`;
+    d += ` L ${positions[i].x * 100} ${positions[i].yPx}`;
   }
   return d;
 }
@@ -84,75 +80,48 @@ export function StageMap({ bundles, progress }: Props) {
   });
 
   const pathFull = buildPath(positions);
-  const pathActive =
-    lastClearedGlobalIdx >= 1
-      ? buildPath(positions.slice(0, lastClearedGlobalIdx + 1))
-      : "";
 
   return (
     <div className="relative w-full" style={{ height: totalHeight }}>
+      {bundles.map((bundle, themeIdx) => {
+        const firstIdx = themeIdx * STAGES_PER_THEME;
+        const lastIdx = firstIdx + STAGES_PER_THEME - 1;
+        const topY = positions[lastIdx].yPx;
+        const bottomY = positions[firstIdx].yPx;
+        const isComingSoon = bundle.status === "coming-soon";
+        // 라벨 묶음을 박스의 자식으로 — 박스 좌상단 기준으로 항상 박스 안에 위치
+        return (
+          <div
+            key={`band-${bundle.id}`}
+            className="stage-band"
+            style={{
+              top: topY - BOX_TOP_PAD,
+              height: bottomY - topY + BOX_TOP_PAD + 30,
+            }}
+          >
+            <div className="stage-label-group">
+              {isComingSoon && <span className="stage-tag">COMING SOON</span>}
+              <span className="stage-label">{bundle.name}</span>
+            </div>
+          </div>
+        );
+      })}
+
       <svg
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 z-[1] h-full w-full"
         viewBox={`0 0 100 ${totalHeight}`}
         preserveAspectRatio="none"
       >
         <path
           d={pathFull}
           fill="none"
-          stroke="rgba(255,255,255,0.85)"
+          stroke="rgba(255,255,255,0.92)"
           strokeWidth="7"
           strokeLinecap="round"
-          strokeDasharray="0.1 14"
+          strokeDasharray="0.1 18"
           vectorEffect="non-scaling-stroke"
         />
-        {pathActive && (
-          <path
-            d={pathActive}
-            fill="none"
-            stroke="rgb(94 201 226)"
-            strokeWidth="7"
-            strokeLinecap="round"
-            strokeDasharray="0.1 14"
-            vectorEffect="non-scaling-stroke"
-          />
-        )}
       </svg>
-
-      {bundles.map((bundle, themeIdx) => {
-        const firstIdx = themeIdx * STAGES_PER_THEME;
-        const lastIdx = firstIdx + STAGES_PER_THEME - 1;
-        // flipped: lastIdx is now topmost (smallest y), firstIdx is bottommost
-        const topY = positions[lastIdx].yPx;
-        const bottomY = positions[firstIdx].yPx;
-        const midY = (topY + bottomY) / 2;
-        const isComingSoon = bundle.status === "coming-soon";
-
-        return (
-          <Fragment key={bundle.id}>
-            <div
-              className="absolute left-0 right-0 text-center"
-              style={{ top: topY - 38 }}
-            >
-              <h3
-                className={`text-xs tracking-[0.3em] ${isComingSoon ? "opacity-30" : "opacity-60"}`}
-              >
-                {bundle.name}
-              </h3>
-            </div>
-
-            {isComingSoon && (
-              <div
-                className="pointer-events-none absolute left-1/2 -translate-x-1/2"
-                style={{ top: midY - 14 }}
-              >
-                <div className="rounded bg-black/70 px-3 py-1 text-[10px] tracking-widest text-zinc-400 backdrop-blur-sm">
-                  COMING SOON
-                </div>
-              </div>
-            )}
-          </Fragment>
-        );
-      })}
 
       {positions.map((pos, globalIdx) => {
         const themeIdx = Math.floor(globalIdx / STAGES_PER_THEME);
@@ -171,83 +140,35 @@ export function StageMap({ bundles, progress }: Props) {
           status = "locked";
         }
 
+        const cls = `stage-node stage-node--${status}`;
+        const style = { left: `${pos.x * 100}%`, top: `${pos.yPx}px` };
+        const clickable =
+          (status === "cleared" || status === "current") && stageId;
+
+        if (clickable) {
+          return (
+            <Link
+              key={globalIdx}
+              href={`/play/${stageId}`}
+              data-stage-status={status}
+              className={cls}
+              style={style}
+            >
+              {stageIdx + 1}
+            </Link>
+          );
+        }
         return (
           <div
             key={globalIdx}
             data-stage-status={status}
-            className="absolute"
-            style={{
-              left: `${pos.x * 100}%`,
-              top: `${pos.yPx}px`,
-              transform: "translate(-50%, -50%)",
-            }}
+            className={cls}
+            style={style}
           >
-            <StageCircle
-              stageId={stageId}
-              index={stageIdx + 1}
-              status={status}
-            />
+            {stageIdx + 1}
           </div>
         );
       })}
     </div>
-  );
-}
-
-function StageCircle({
-  stageId,
-  index,
-  status,
-}: {
-  stageId: string | undefined;
-  index: number;
-  status: StageStatus;
-}) {
-  const base =
-    "relative flex h-14 w-14 items-center justify-center bg-contain bg-center bg-no-repeat text-base font-bold [image-rendering:pixelated]";
-  const isBright = status === "current" || status === "cleared";
-  const textColor = isBright
-    ? "text-black/75 [text-shadow:_0_1px_0_rgb(255_255_255_/_35%)]"
-    : "text-white/45";
-  const label = <span className="relative z-10">{index}</span>;
-  const style = { backgroundImage: `url(/sprites/nodes/${status}.png)` };
-
-  if (status === "placeholder") {
-    return (
-      <div className={`${base} ${textColor}`} style={style}>
-        {label}
-      </div>
-    );
-  }
-
-  if (status === "locked") {
-    return (
-      <div className={`${base} ${textColor} cursor-not-allowed`} style={style}>
-        {label}
-      </div>
-    );
-  }
-
-  if (status === "cleared") {
-    return (
-      <Link
-        href={`/play/${stageId}`}
-        className={`${base} ${textColor} transition hover:brightness-110`}
-        style={style}
-      >
-        {label}
-      </Link>
-    );
-  }
-
-  // current
-  return (
-    <Link
-      href={`/play/${stageId}`}
-      className={`${base} ${textColor} animate-pulse transition hover:brightness-110`}
-      style={style}
-    >
-      {label}
-    </Link>
   );
 }

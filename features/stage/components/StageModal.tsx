@@ -51,7 +51,8 @@ export function StageModal({ onClose }: Props) {
   return (
     <div
       ref={scrollRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/45 font-mono text-white"
+      className="fixed inset-0 z-50 overflow-y-auto font-mono text-white"
+      style={{ background: "var(--backdrop)" }}
     >
       <div className="fixed left-4 top-4 z-[60]">
         <GameButton size="sm" onClick={onClose}>
@@ -59,15 +60,27 @@ export function StageModal({ onClose }: Props) {
         </GameButton>
       </div>
 
-      <div className="relative flex min-h-dvh flex-col items-center px-4 py-10">
-        <h1 className="mb-8 text-4xl font-bold tracking-widest [text-shadow:_0_2px_8px_rgb(0_0_0_/_85%)]">
-          스테이지 선택
-        </h1>
-
+      <div className="relative flex min-h-dvh flex-col items-center px-4 py-12">
         <div className="w-full max-w-xl">
           <StageMap bundles={bundles} progress={progress} />
         </div>
       </div>
+
+      <div className="stage-legend">
+        <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
+        <LegendItem color="#6BD6AB" label="깬 스테이지" />
+        <LegendItem color="#FF9BBC" label="아직 깨기 전" />
+        <LegendItem color="#A8B0BB" label="준비 중" />
+      </div>
+    </div>
+  );
+}
+
+function LegendItem({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="stage-legend__item">
+      <span className="stage-legend__chip" style={{ background: color }} />
+      {label}
     </div>
   );
 }
