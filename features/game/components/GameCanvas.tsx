@@ -12,7 +12,7 @@ import { useIsTouch } from "@/lib/touch";
 import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
-import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
+import { HEART_BONUS, VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
 import type { Engine, GameStatus } from "../engine/types";
 
 type Props = {
@@ -26,6 +26,17 @@ export function GameCanvas({ stage }: Props) {
   const [status, setStatus] = useState<GameStatus>("playing");
   const [manualPaused, setManualPaused] = useState(false);
   const [ready, setReady] = useState(false);
+  const [result, setResult] = useState<{
+    score: number;
+    timeBonus: number;
+    heartBonus: number;
+    heartCount: number;
+    total: number;
+    best: number;
+    isNewBest: boolean;
+  } | null>(null);
+  // 결과 카운트업 애니메이션 진행 시간(초)
+  const [anim, setAnim] = useState(0);
   const portrait = useIsPortrait();
   const isTouch = useIsTouch();
 
@@ -114,6 +125,20 @@ export function GameCanvas({ stage }: Props) {
         audio.play().catch(() => {});
       }
     } else if (status === "won") {
+      const s = engineRef.current?.getState();
+      if (s) {
+        const score = Math.floor(s.score);
+        setResult({
+          score,
+          timeBonus: s.timeBonus,
+          heartBonus: s.heartBonus,
+          heartCount: s.lives,
+          total: score + s.timeBonus + s.heartBonus,
+          best: s.bestScore,
+          isNewBest: s.isNewBest,
+        });
+        setAnim(0);
+      }
       submitMyScore(stage.bundleId).catch((e) =>
         console.error("score submit failed", e),
       );
@@ -133,6 +158,19 @@ export function GameCanvas({ stage }: Props) {
       };
     }
   }, [status]);
+
+  // 결과 카운트업 애니메이션 — won + result일 때 진행 시간을 rAF로 증가
+  useEffect(() => {
+    if (status !== "won" || !result) return;
+    const end = 1.7 + result.heartCount * 0.3 + 1.2;
+    const start = performance.now();
+    let raf = requestAnimationFrame(function loop() {
+      const t = (performance.now() - start) / 1000;
+      setAnim(t);
+      if (t < end) raf = requestAnimationFrame(loop);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [status, result]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -279,27 +317,133 @@ export function GameCanvas({ stage }: Props) {
         </div>
       )}
 
-      {status !== "playing" && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[10%] z-10 flex justify-center">
-          <div className="pointer-events-auto flex gap-3">
+      {status === "won" && result && (
+        <ResultOverlay
+          result={result}
+          anim={anim}
+          showNext={showNext}
+          retryIsPrimary={retryIsPrimary}
+          onExit={handleExit}
+          onRetry={handleRetry}
+          onNext={handleNext}
+        />
+      )}
+
+      {status === "dead" && (
+        <div className="result-overlay">
+          <h2 className="result-title result-title--over">GAME OVER</h2>
+          <div className="result-actions">
             <GameButton size="md" onClick={handleExit}>
               나가기
             </GameButton>
-            <GameButton
-              size="md"
-              variant={retryIsPrimary ? "primary" : "secondary"}
-              onClick={handleRetry}
-            >
+            <GameButton size="md" variant="primary" onClick={handleRetry}>
               다시하기
             </GameButton>
-            {showNext && (
-              <GameButton size="md" variant="primary" onClick={handleNext}>
-                다음 스테이지 ▶
-              </GameButton>
-            )}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+type ResultData = {
+  score: number;
+  timeBonus: number;
+  heartBonus: number;
+  heartCount: number;
+  total: number;
+  best: number;
+  isNewBest: boolean;
+};
+
+function ResultOverlay({
+  result,
+  anim,
+  showNext,
+  retryIsPrimary,
+  onExit,
+  onRetry,
+  onNext,
+}: {
+  result: ResultData;
+  anim: number;
+  showNext: boolean;
+  retryIsPrimary: boolean;
+  onExit: () => void;
+  onRetry: () => void;
+  onNext: () => void;
+}) {
+  // 캔버스 버전과 동일한 타이밍: TIME → HEART(하트당 0.3s) → TOTAL/BEST
+  const shownTime = Math.floor(result.timeBonus * clamp01((anim - 0.4) / 1.0));
+  const heartsConsumed = Math.max(
+    0,
+    Math.min(result.heartCount, Math.floor((anim - 1.7) / 0.3)),
+  );
+  const shownHeart = heartsConsumed * HEART_BONUS;
+  const heartsDoneAt = 1.7 + result.heartCount * 0.3;
+  const showTotal = anim >= heartsDoneAt + 0.5;
+  const shownTotal = result.score + shownTime + shownHeart;
+
+  return (
+    <div className="result-overlay">
+      <h2 className="result-title">STAGE CLEAR</h2>
+      <div className="result-card">
+        <div className="result-row">
+          <span>SCORE</span>
+          <span>{result.score.toLocaleString()}</span>
+        </div>
+        <div
+          className="result-row result-row--time"
+          style={{ opacity: anim >= 0.4 ? 1 : 0 }}
+        >
+          <span>TIME bonus</span>
+          <span>+{shownTime.toLocaleString()}</span>
+        </div>
+        <div
+          className="result-row result-row--heart"
+          style={{ opacity: anim >= 1.7 ? 1 : 0 }}
+        >
+          <span>HEART bonus</span>
+          <span>+{shownHeart.toLocaleString()}</span>
+        </div>
+        <div className="result-divider" />
+        <div
+          className="result-row result-row--total"
+          style={{ opacity: showTotal ? 1 : 0 }}
+        >
+          <span>TOTAL</span>
+          <span>{shownTotal.toLocaleString()}</span>
+        </div>
+        <div
+          className="result-row result-row--best"
+          style={{ opacity: showTotal ? 1 : 0 }}
+        >
+          <span>BEST</span>
+          <span>{result.best.toLocaleString()}</span>
+        </div>
+        {showTotal && result.isNewBest && (
+          <div className="result-newbest">★ BEST SCORE ★</div>
+        )}
+      </div>
+      <div className="result-actions">
+        <GameButton size="md" onClick={onExit}>
+          나가기
+        </GameButton>
+        <GameButton
+          size="md"
+          variant={retryIsPrimary ? "primary" : "secondary"}
+          onClick={onRetry}
+        >
+          다시하기
+        </GameButton>
+        {showNext && (
+          <GameButton size="md" variant="primary" onClick={onNext}>
+            다음 스테이지 ▶
+          </GameButton>
+        )}
+      </div>
     </div>
   );
 }
