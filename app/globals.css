@@ -748,8 +748,8 @@ a.stage-node--current:hover {
 /* ---------- Stage legend (우하단) ---------- */
 .stage-legend {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 28px;
+  right: 28px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -775,6 +775,32 @@ a.stage-node--current:hover {
   border: 2px solid #fff;
   border-radius: 50%;
   flex-shrink: 0;
+}
+/* 모바일: 범례 토글 ⓘ 버튼 (우하단 고정, 흰 보더·흰 아이콘) */
+.stage-legend-toggle {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 6;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: rgba(11, 58, 82, 0.45);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -4px rgba(11, 30, 46, 0.35);
+}
+/* 모바일 범례 박스 — ⓘ 위로 일정 패딩(12px) 두고 표시 */
+.stage-legend--mobile {
+  bottom: 92px;
+  right: 28px;
 }
 
 /* ---------- 게임 결과창 (STAGE CLEAR / GAME OVER) ---------- */

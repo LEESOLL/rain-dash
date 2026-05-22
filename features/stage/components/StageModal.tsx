@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { GameButton } from "@/components/GameButton";
 import { StageMap } from "@/features/stage/components/StageMap";
 import {
@@ -10,6 +10,7 @@ import {
   subscribeProgress,
 } from "@/features/stage/stageProgressRepository";
 import { getBundles } from "@/features/stage/stageRepository";
+import { useIsTouch } from "@/lib/touch";
 
 type Props = {
   onClose: () => void;
@@ -17,6 +18,9 @@ type Props = {
 
 export function StageModal({ onClose }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isTouch = useIsTouch();
+  // 모바일: 범례가 노드와 겹쳐 ⓘ 버튼으로 토글
+  const [legendOpen, setLegendOpen] = useState(false);
 
   useEffect(() => {
     fetchProgress().catch((e) => console.error("progress fetch failed", e));
@@ -66,12 +70,33 @@ export function StageModal({ onClose }: Props) {
         </div>
       </div>
 
-      <div className="stage-legend">
-        <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
-        <LegendItem color="#6BD6AB" label="깬 스테이지" />
-        <LegendItem color="#FF9BBC" label="아직 깨기 전" />
-        <LegendItem color="#A8B0BB" label="준비 중" />
-      </div>
+      {isTouch ? (
+        <>
+          {legendOpen && (
+            <div className="stage-legend stage-legend--mobile">
+              <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
+              <LegendItem color="#6BD6AB" label="깬 스테이지" />
+              <LegendItem color="#FF9BBC" label="아직 깨기 전" />
+              <LegendItem color="#A8B0BB" label="준비 중" />
+            </div>
+          )}
+          <button
+            type="button"
+            className="stage-legend-toggle"
+            onClick={() => setLegendOpen((o) => !o)}
+            aria-label="범례 보기"
+          >
+            ⓘ
+          </button>
+        </>
+      ) : (
+        <div className="stage-legend">
+          <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
+          <LegendItem color="#6BD6AB" label="깬 스테이지" />
+          <LegendItem color="#FF9BBC" label="아직 깨기 전" />
+          <LegendItem color="#A8B0BB" label="준비 중" />
+        </div>
+      )}
     </div>
   );
 }
