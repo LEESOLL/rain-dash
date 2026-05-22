@@ -14,6 +14,7 @@ import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
 import { HEART_BONUS, VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
 import type { Engine, GameStatus } from "../engine/types";
+import { LoadingOverlay } from "./LoadingOverlay";
 
 type Props = {
   stage: Stage;
@@ -26,6 +27,9 @@ export function GameCanvas({ stage }: Props) {
   const [status, setStatus] = useState<GameStatus>("playing");
   const [manualPaused, setManualPaused] = useState(false);
   const [ready, setReady] = useState(false);
+  // 표시용 진행률 = min(실제 로딩률, 경과시간/최소시간) — 캐시로 너무 빨리 끝나도 부드럽게
+  const [displayProgress, setDisplayProgress] = useState(0);
+  const loadedRef = useRef(0);
   const [result, setResult] = useState<{
     score: number;
     timeBonus: number;
@@ -61,6 +65,23 @@ export function GameCanvas({ stage }: Props) {
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+
+  // 로딩 진행률·최소 표시 시간(3초) — 실제 로딩과 경과시간 중 작은 값으로 채우고 둘 다 끝나면 ready
+  useEffect(() => {
+    const MIN_MS = 3000;
+    const start = performance.now();
+    let raf = requestAnimationFrame(function loop() {
+      const elapsed = performance.now() - start;
+      const timeRatio = Math.min(1, elapsed / MIN_MS);
+      setDisplayProgress(Math.min(loadedRef.current, timeRatio));
+      if (loadedRef.current >= 1 && elapsed >= MIN_MS) {
+        setReady(true);
+        return;
+      }
+      raf = requestAnimationFrame(loop);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   // 모바일 터치 입력 — 화면 3등분: 좌=뒤로, 우=앞으로, 가운데=점프 (멀티터치)
   useEffect(() => {
@@ -185,7 +206,9 @@ export function GameCanvas({ stage }: Props) {
       onStateChange: (state) => {
         setStatus(state.status);
       },
-      onReady: () => setReady(true),
+      onProgress: (ratio) => {
+        loadedRef.current = ratio;
+      },
     });
     engineRef.current = engine;
     setStatus("playing");
@@ -265,10 +288,12 @@ export function GameCanvas({ stage }: Props) {
     <div className="relative h-full w-full">
       <canvas ref={canvasRef} className="block h-full w-full touch-none" />
 
+      {!ready && <LoadingOverlay progress={displayProgress} />}
+
       {showTouchGuide && (
         <div
           onClick={dismissTouchGuide}
-          className="absolute inset-0 z-30 flex flex-col bg-black/70 font-mono text-white"
+          className="fixed inset-0 z-30 flex flex-col bg-black/70 font-mono text-white"
         >
           <div className="grid flex-1 grid-cols-3">
             <div className="flex flex-col items-center justify-center gap-2 border-r border-white/25">
@@ -300,7 +325,7 @@ export function GameCanvas({ stage }: Props) {
       )}
 
       {showPauseOverlay && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/55 font-mono text-white">
+        <div className="fixed inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/55 font-mono text-white">
           <h2 className="text-2xl font-bold tracking-widest">일시정지</h2>
           <div className="flex gap-3">
             <GameButton size="md" onClick={handleExit}>

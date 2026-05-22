@@ -5,7 +5,7 @@ import type { Item, ItemType, Puddle, Shelter } from "@/features/stage/types";
 import type { Engine, EngineConfig, GameState, Input } from "./types";
 
 export function createEngine(config: EngineConfig): Engine {
-  const { canvas, stage, onStateChange, onReady } = config;
+  const { canvas, stage, onStateChange, onReady, onProgress } = config;
   const ctx = canvas.getContext("2d")!;
   const input = {
     left: false,
@@ -176,11 +176,13 @@ export function createEngine(config: EngineConfig): Engine {
   const houseFrames: HTMLCanvasElement[] = [];
   let houseFrameW = 1;
   let houseFrameH = 1;
-  let pendingAssets = 0;
+  let totalAssets = 0;
+  let loadedAssets = 0;
   let assetsReady = false;
   function assetLoaded() {
-    pendingAssets--;
-    if (pendingAssets <= 0 && !assetsReady) {
+    loadedAssets++;
+    onProgress?.(totalAssets > 0 ? loadedAssets / totalAssets : 1);
+    if (loadedAssets >= totalAssets && !assetsReady) {
       assetsReady = true;
       onReady?.();
     }
@@ -189,7 +191,7 @@ export function createEngine(config: EngineConfig): Engine {
   let bgW = 1;
   let bgH = 1;
   {
-    pendingAssets++;
+    totalAssets++;
     const img = new Image();
     img.onload = () => {
       bgImage = img;
@@ -206,7 +208,7 @@ export function createEngine(config: EngineConfig): Engine {
     targetFrames: HTMLCanvasElement[],
     setDims: (w: number, h: number) => void,
   ) {
-    pendingAssets++;
+    totalAssets++;
     const img = new Image();
     img.onerror = assetLoaded;
     img.onload = () => {

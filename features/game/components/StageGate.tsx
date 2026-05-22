@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchProgress } from "@/features/stage/stageProgressRepository";
 import { isStageUnlocked } from "@/features/stage/stageRepository";
 import { setMainView } from "@/lib/mainView";
+import { LoadingOverlay } from "./LoadingOverlay";
 import type { Stage } from "@/features/stage/types";
 import { GameCanvas } from "./GameCanvas";
 
@@ -42,8 +43,8 @@ export function StageGate({ stage }: Props) {
 
   if (allowed !== true) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-[#bfe6f2] font-mono tracking-widest text-sky-900/70">
-        불러오는 중...
+      <div className="relative h-full w-full">
+        <LoadingOverlay progress={0} />
       </div>
     );
   }

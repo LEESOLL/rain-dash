@@ -915,3 +915,119 @@ a.stage-node--current:hover {
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 2px 4px rgba(11, 58, 82, 0.5);
 }
+
+/* ---------- 게임 로딩 화면 ---------- */
+.game-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  background: linear-gradient(180deg, #bde3fb 0%, #ddeffc 55%, #f2f9fe 100%);
+  font-family: "PF Stardust", sans-serif;
+}
+.game-loading__logo {
+  width: min(58vw, 300px);
+  filter: drop-shadow(0 4px 16px rgba(11, 58, 82, 0.2));
+  z-index: 2;
+}
+/* 빗방울 */
+.loading__rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.loading__rain span {
+  position: absolute;
+  top: -30px;
+  width: 3px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 2px;
+  animation: rain-fall 1.5s linear infinite;
+}
+@keyframes rain-fall {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
+}
+/* progress bar */
+.progress {
+  position: relative;
+  z-index: 2;
+  width: min(380px, 80%);
+  height: 22px;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: 0 4px 0 0 rgba(11, 58, 82, 0.18);
+}
+.progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--color-mint) 0%,
+    #5fd4fe 45%,
+    var(--color-sky-400) 75%,
+    var(--color-sky-500) 100%
+  );
+  transition: width 280ms ease;
+}
+.loading__meta {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--text-strong);
+}
+.loading__pct {
+  color: var(--color-sky-600);
+  font-weight: 700;
+}
+.loading__tip {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(440px, 88%);
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--text-body);
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid #ffffff;
+  border-radius: 14px;
+  padding: 10px 14px;
+  transition: opacity 300ms ease;
+}
+.loading__tip__tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  background: var(--color-sky-400);
+  color: #fff;
+  border: 1.5px solid #fff;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
