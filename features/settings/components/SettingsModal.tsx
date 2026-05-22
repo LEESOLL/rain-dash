@@ -6,6 +6,7 @@ import { resetAllData } from "@/features/settings/settingsRepository";
 import { refreshUserCache } from "@/features/user/userStore";
 import { GameButton } from "@/components/GameButton";
 import { Modal } from "@/components/Modal";
+import { ToggleButton } from "@/components/ToggleButton";
 import { isAudioEnabled, setAudioPref } from "@/lib/sound";
 
 type Props = {
@@ -22,8 +23,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const [sound, setSound] = useState<boolean>(() => isAudioEnabled());
   const [confirmReset, setConfirmReset] = useState(false);
 
-  function handleSoundToggle() {
-    const next = !sound;
+  function handleSoundToggle(next: boolean) {
     setSound(next);
     setAudioPref(next);
   }
@@ -41,42 +41,44 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose}>
-      <div className="flex flex-col gap-6">
-        <h2 className="text-center text-xl font-bold tracking-widest">설정</h2>
-
-        <div className="flex items-center justify-between">
-          <span className="text-sm">사운드</span>
-          <GameButton
-            size="sm"
-            variant={sound ? "primary" : "secondary"}
-            className="w-20"
-            onClick={handleSoundToggle}
-          >
-            {sound ? "ON" : "OFF"}
-          </GameButton>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="설정"
+      subtitle="SETTINGS"
+      showClose
+      footer={
+        <GameButton block onClick={onClose}>
+          닫기
+        </GameButton>
+      }
+    >
+      <div className="setting-row">
+        <div>
+          <div className="setting-row__label">사운드</div>
+          <div className="setting-row__hint">효과음 · 배경음</div>
         </div>
+        <div className="w-28">
+          <ToggleButton on={sound} onChange={handleSoundToggle} block />
+        </div>
+      </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-sm">진행도 초기화</span>
-            <span className="text-xs opacity-50">
-              닉네임 · 점수 · 베스트 기록 모두 삭제
-            </span>
+      <div className="setting-row">
+        <div>
+          <div className="setting-row__label">진행도 초기화</div>
+          <div className="setting-row__hint">
+            닉네임 · 점수 · 베스트 기록 모두 삭제
           </div>
+        </div>
+        <div className="w-28">
           <GameButton
             size="sm"
+            block
             variant={confirmReset ? "danger" : "secondary"}
             onClick={handleReset}
             onMouseLeave={() => setConfirmReset(false)}
           >
             {confirmReset ? "정말 삭제?" : "초기화"}
-          </GameButton>
-        </div>
-
-        <div className="flex justify-center pt-2">
-          <GameButton size="md" onClick={onClose}>
-            닫기
           </GameButton>
         </div>
       </div>

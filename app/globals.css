@@ -547,8 +547,8 @@ img[data-pixel] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 4px;
-  border-bottom: 1px solid var(--line-soft);
+  padding: 16px 4px;
+  border-bottom: 1.5px dashed var(--line-mid);
   gap: 14px;
 }
 .setting-row:last-child {

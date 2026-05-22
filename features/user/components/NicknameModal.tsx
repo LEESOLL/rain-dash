@@ -43,25 +43,20 @@ function NicknameModalContent({
     <Modal
       isOpen={true}
       onClose={onClose}
-      align="top"
-      panelClassName="rounded-2xl border-2 border-white bg-white/90 backdrop-blur-md shadow-xl"
+      showClose
+      title="닉네임 입력"
+      subtitle="NICKNAME"
     >
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSave();
         }}
-        className="flex flex-col items-center gap-6 text-sky-900"
+        className="flex flex-col gap-4"
       >
-        <div className="text-center">
-          <h2 className="mb-1 text-xl font-bold tracking-widest text-sky-400">
-            닉네임 입력
-          </h2>
-          <p className="text-xs text-sky-700/60">
-            건너뛰면 기본 닉네임이 생성됩니다
-          </p>
-        </div>
-
+        <p className="text-center text-xs text-[var(--text-muted)]">
+          건너뛰면 기본 닉네임이 생성됩니다
+        </p>
         <input
           type="text"
           value={nicknameInput}
@@ -70,14 +65,14 @@ function NicknameModalContent({
           maxLength={20}
           autoFocus
           enterKeyHint="done"
-          className="w-full rounded-2xl border-2 border-sky-200 bg-white px-4 py-2.5 text-center text-sky-900 outline-none transition placeholder:text-sky-300 focus:border-sky-400"
+          className="text-input text-center"
         />
 
         <div className="flex gap-3">
-          <GameButton size="md" variant="primary" type="submit">
+          <GameButton size="md" variant="primary" block type="submit">
             확인
           </GameButton>
-          <GameButton size="md" variant="ghost" onClick={handleSkip}>
+          <GameButton size="md" variant="ghost" block onClick={handleSkip}>
             건너뛰기
           </GameButton>
         </div>

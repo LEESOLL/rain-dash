@@ -55,13 +55,13 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      panelClassName="max-w-xl rounded-3xl border-2 border-white/70 bg-white/80 backdrop-blur-md shadow-xl"
+      title="게임 방법"
+      subtitle="HOW TO PLAY"
+      showClose
+      maxWidth={560}
+      bodyClassName="max-h-[74vh] overflow-y-auto"
     >
-      <div className="flex max-h-[82vh] flex-col gap-5 overflow-y-auto pr-1 text-sky-900">
-        <h2 className="text-center text-xl font-bold tracking-widest text-sky-400">
-          게임 방법
-        </h2>
-
+      <div className="flex flex-col gap-5 pb-6 text-sky-900">
         <div className="flex flex-col gap-2">
           <SectionLabel>조작</SectionLabel>
           {isTouch ? (
