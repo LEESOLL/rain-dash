@@ -1,9 +1,9 @@
 import type { Stage } from "../../types";
 
-export const rainyDay01: Stage = {
-  id: "rainy-day-01",
-  bundleId: "rainy-day",
-  name: "비 오는 낮 거리 — 1",
+export const rainyStreet01: Stage = {
+  id: "rainy_street-01",
+  bundleId: "rainy_street",
+  name: "비 오는 거리 — 1",
   difficulty: "easy",
   goalDistance: 10000,
   shelters: [

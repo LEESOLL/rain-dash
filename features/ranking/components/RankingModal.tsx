@@ -23,7 +23,7 @@ type Props = {
 
 export function RankingModal({ onClose }: Props) {
   const [tab, setTab] = useState<Tab>("cumulative");
-  const [bundleId, setBundleId] = useState<string>("rainy-day");
+  const [bundleId, setBundleId] = useState<string>("rainy_street");
 
   useEffect(() => {
     refreshRanking();

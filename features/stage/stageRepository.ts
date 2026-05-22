@@ -1,10 +1,16 @@
 import { BUNDLES } from "./data/bundles";
-import { rainyDay01 } from "./data/stages/rainy-day-01";
-import { rainyDay02 } from "./data/stages/rainy-day-02";
-import { rainyDay03 } from "./data/stages/rainy-day-03";
+import { rainyStreet01 } from "./data/stages/rainy_street-01";
+import { rainyStreet02 } from "./data/stages/rainy_street-02";
+import { rainyStreet03 } from "./data/stages/rainy_street-03";
+import { rainyStreet04 } from "./data/stages/rainy_street-04";
 import type { Bundle, Stage } from "./types";
 
-const STAGES: Stage[] = [rainyDay01, rainyDay02, rainyDay03];
+const STAGES: Stage[] = [
+  rainyStreet01,
+  rainyStreet02,
+  rainyStreet03,
+  rainyStreet04,
+];
 
 export function getBundles(): Bundle[] {
   return BUNDLES;

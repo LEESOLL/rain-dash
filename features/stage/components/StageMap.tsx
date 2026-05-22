@@ -3,7 +3,6 @@
 import Link from "next/link";
 import type { Bundle, StageProgress } from "../types";
 
-const STAGES_PER_THEME = 3;
 const PAD_TOP = 60;
 // 맨 위 번들 박스(BOX_TOP_PAD만큼 위로 확장)가 잘리지 않게 상단 여백 확보
 const PAD_BOTTOM = 165;
@@ -14,7 +13,12 @@ const BOX_TOP_PAD = 145;
 const X_CENTER = 0.5;
 const X_AMP = 0.34;
 
-type Position = { x: number; yPx: number };
+type Position = {
+  x: number;
+  yPx: number;
+  bundleIdx: number;
+  stageIdx: number;
+};
 
 // 인덱스 기반 의사난수 (0~1) — 매번 같은 불규칙 배치
 function hashRand(i: number): number {
@@ -22,27 +26,41 @@ function hashRand(i: number): number {
   return s - Math.floor(s);
 }
 
-function computeLayout(themeCount: number): {
+// 번들별 스테이지 개수가 다를 수 있어 누적 배치 (아래→위, 첫 번들이 맨 아래)
+function computeLayout(counts: number[]): {
   positions: Position[];
   totalHeight: number;
 } {
-  const themeBlockHeight = STAGES_PER_THEME * INTRA_GAP + INTER_GAP;
-  const maxOriginalY =
-    PAD_TOP +
-    (themeCount - 1) * themeBlockHeight +
-    (STAGES_PER_THEME - 1) * INTRA_GAP;
-  const totalHeight = maxOriginalY + PAD_BOTTOM;
-
-  const positions: Position[] = [];
-  for (let t = 0; t < themeCount; t++) {
-    for (let s = 0; s < STAGES_PER_THEME; s++) {
-      const globalIdx = t * STAGES_PER_THEME + s;
-      const originalY = PAD_TOP + t * themeBlockHeight + s * INTRA_GAP;
-      const yPx = totalHeight - originalY;
-      const x = X_CENTER + (hashRand(globalIdx) - 0.5) * 2 * X_AMP;
-      positions.push({ x, yPx });
+  const meta: { bundleIdx: number; stageIdx: number; oy: number }[] = [];
+  let oy = PAD_TOP;
+  counts.forEach((cnt, bi) => {
+    // 번들 사이 간격 — 박스가 위/아래로 커서 충분히 벌려야 겹치지 않음
+    if (bi > 0) oy += INTER_GAP + INTRA_GAP;
+    for (let s = 0; s < cnt; s++) {
+      meta.push({ bundleIdx: bi, stageIdx: s, oy });
+      if (s < cnt - 1) oy += INTRA_GAP;
     }
-  }
+  });
+  const maxOriginalY = meta.length > 0 ? meta[meta.length - 1].oy : PAD_TOP;
+  const totalHeight = maxOriginalY + PAD_BOTTOM;
+  const lastBundle = counts.length - 1;
+
+  const positions = meta.map((m, gi) => {
+    let x: number;
+    if (m.bundleIdx === lastBundle) {
+      // 우주(마지막 번들): 아래→위로 갈수록 왼쪽으로 극적으로 펼침 + 약간 랜덤
+      const raw = 0.78 - m.stageIdx * 0.28 + (hashRand(gi) - 0.5) * 0.18;
+      x = Math.max(0.12, Math.min(0.88, raw));
+    } else {
+      x = X_CENTER + (hashRand(gi) - 0.5) * 2 * X_AMP;
+    }
+    return {
+      x,
+      yPx: totalHeight - m.oy,
+      bundleIdx: m.bundleIdx,
+      stageIdx: m.stageIdx,
+    };
+  });
   return { positions, totalHeight };
 }
 
@@ -63,33 +81,31 @@ type Props = {
 };
 
 export function StageMap({ bundles, progress }: Props) {
-  const { positions, totalHeight } = computeLayout(bundles.length);
+  const counts = bundles.map((b) => Math.max(1, b.stageIds.length));
+  const { positions, totalHeight } = computeLayout(counts);
 
-  let lastClearedGlobalIdx = -1;
+  // 첫 번째 미클리어 스테이지(현재 차례) — available 번들만
   let firstUnclearedGlobalIdx = -1;
-  bundles.forEach((bundle, themeIdx) => {
-    bundle.stageIds.forEach((stageId, stageIdx) => {
-      if (stageIdx >= STAGES_PER_THEME) return;
-      const globalIdx = themeIdx * STAGES_PER_THEME + stageIdx;
-      if (progress.clearedStageIds.includes(stageId)) {
-        lastClearedGlobalIdx = Math.max(lastClearedGlobalIdx, globalIdx);
-      } else if (firstUnclearedGlobalIdx === -1) {
-        firstUnclearedGlobalIdx = globalIdx;
-      }
-    });
+  positions.forEach((pos, gi) => {
+    if (firstUnclearedGlobalIdx !== -1) return;
+    const bundle = bundles[pos.bundleIdx];
+    if (bundle.status !== "available") return;
+    const stageId = bundle.stageIds[pos.stageIdx];
+    if (stageId && !progress.clearedStageIds.includes(stageId)) {
+      firstUnclearedGlobalIdx = gi;
+    }
   });
 
   const pathFull = buildPath(positions);
 
   return (
     <div className="relative w-full" style={{ height: totalHeight }}>
-      {bundles.map((bundle, themeIdx) => {
-        const firstIdx = themeIdx * STAGES_PER_THEME;
-        const lastIdx = firstIdx + STAGES_PER_THEME - 1;
-        const topY = positions[lastIdx].yPx;
-        const bottomY = positions[firstIdx].yPx;
+      {bundles.map((bundle, bi) => {
+        const range = positions.filter((p) => p.bundleIdx === bi);
+        if (range.length === 0) return null;
+        const topY = range[range.length - 1].yPx;
+        const bottomY = range[0].yPx;
         const isComingSoon = bundle.status === "coming-soon";
-        // 라벨 묶음을 박스의 자식으로 — 박스 좌상단 기준으로 항상 박스 안에 위치
         return (
           <div
             key={`band-${bundle.id}`}
@@ -123,18 +139,16 @@ export function StageMap({ bundles, progress }: Props) {
         />
       </svg>
 
-      {positions.map((pos, globalIdx) => {
-        const themeIdx = Math.floor(globalIdx / STAGES_PER_THEME);
-        const stageIdx = globalIdx % STAGES_PER_THEME;
-        const bundle = bundles[themeIdx];
-        const stageId = bundle.stageIds[stageIdx];
+      {positions.map((pos, gi) => {
+        const bundle = bundles[pos.bundleIdx];
+        const stageId = bundle.stageIds[pos.stageIdx];
 
         let status: StageStatus;
         if (bundle.status === "coming-soon" || !stageId) {
           status = "placeholder";
         } else if (progress.clearedStageIds.includes(stageId)) {
           status = "cleared";
-        } else if (globalIdx === firstUnclearedGlobalIdx) {
+        } else if (gi === firstUnclearedGlobalIdx) {
           status = "current";
         } else {
           status = "locked";
@@ -148,24 +162,24 @@ export function StageMap({ bundles, progress }: Props) {
         if (clickable) {
           return (
             <Link
-              key={globalIdx}
+              key={gi}
               href={`/play/${stageId}`}
               data-stage-status={status}
               className={cls}
               style={style}
             >
-              {stageIdx + 1}
+              {pos.stageIdx + 1}
             </Link>
           );
         }
         return (
           <div
-            key={globalIdx}
+            key={gi}
             data-stage-status={status}
             className={cls}
             style={style}
           >
-            {stageIdx + 1}
+            {pos.stageIdx + 1}
           </div>
         );
       })}
