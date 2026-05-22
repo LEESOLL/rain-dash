@@ -9,8 +9,10 @@ import { StageModal } from "@/features/stage/components/StageModal";
 import { HowToPlayModal } from "@/features/tutorial/components/HowToPlayModal";
 import { ensureAuth } from "@/features/user/authRepository";
 import { NicknameModal } from "@/features/user/components/NicknameModal";
-import { readCachedUser } from "@/features/user/userStore";
+import { createUser } from "@/features/user/userRepository";
+import { readCachedUser, refreshUserCache } from "@/features/user/userStore";
 import { setMainView, useMainView } from "@/lib/mainView";
+import { useIsTouch } from "@/lib/touch";
 import {
   clearBgm,
   getAudioPref,
@@ -24,6 +26,7 @@ export default function Home() {
   const [howtoOpen, setHowtoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const view = useMainView();
+  const isTouch = useIsTouch();
 
   const audioPref = useSyncExternalStore(
     subscribeAudioPref,
@@ -47,6 +50,10 @@ export default function Home() {
 
   function handleStart() {
     if (readCachedUser()) {
+      setMainView("stage");
+    } else if (isTouch) {
+      createUser();
+      refreshUserCache();
       setMainView("stage");
     } else {
       setNicknameOpen(true);
