@@ -144,6 +144,21 @@ img[data-pixel] {
   animation: rotate-hint 1.8s ease-in-out infinite;
 }
 
+/* 메인 타이틀 위아래 플로팅 */
+@keyframes title-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-title-float {
+  animation: title-float 2s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* =========================================================
    디자인 시스템 컴포넌트 (vivid #00BCFE + PF Stardust)
    ========================================================= */

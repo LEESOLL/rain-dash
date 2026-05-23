@@ -88,10 +88,10 @@ export default function Home() {
               <img
                 src="/sprites/ui/title.png"
                 alt="RAIN DASH"
-                className="w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                className="animate-title-float w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
               />
-              <p className="mt-1 text-xs tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)]">
-                time moves fast when you move fast
+              <p className="mt-[-20px] text-base tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)] sm:text-lg">
+                time moves when you move
               </p>
             </div>
 
