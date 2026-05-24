@@ -932,6 +932,18 @@ a.stage-node--current:hover {
 }
 
 /* ---------- 게임 로딩 화면 ---------- */
+/* 세로 기기에서 게임 영역만 -90°(콘텐츠 +90°) 회전해 가로 게임을 채움.
+   너비/높이를 뷰포트와 맞바꾼 뒤 중앙에서 회전 → 화면을 꽉 채운다. */
+.rotate-portrait-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100dvh;
+  height: 100dvw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center;
+}
+
 .game-loading {
   position: fixed;
   inset: 0;

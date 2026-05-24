@@ -43,6 +43,8 @@ export function GameCanvas({ stage }: Props) {
   const [anim, setAnim] = useState(0);
   const portrait = useIsPortrait();
   const isTouch = useIsTouch();
+  // 세로 기기에서는 게임 영역을 CSS로 회전해 보여주므로(PlayViewport), 터치 좌표도 회전축에 맞춰 매핑한다.
+  const rotated = isTouch && portrait;
 
   const [touchGuideDone, setTouchGuideDone] = useState(
     () =>
@@ -50,9 +52,9 @@ export function GameCanvas({ stage }: Props) {
       sessionStorage.getItem("rd:touchGuide") === "1",
   );
 
-  const showTouchGuide = ready && isTouch && !touchGuideDone && !portrait;
+  const showTouchGuide = ready && isTouch && !touchGuideDone;
 
-  const paused = portrait || manualPaused || showTouchGuide;
+  const paused = manualPaused || showTouchGuide;
   const pausedRef = useRef(paused);
 
   const nextStageId = getNextStageId(stage);
@@ -97,15 +99,24 @@ export function GameCanvas({ stage }: Props) {
         return;
       }
       const rect = canvas.getBoundingClientRect();
-      const third = rect.width / 3;
       let left = false;
       let right = false;
       let jump = false;
       for (const t of Array.from(e.touches)) {
-        const x = t.clientX - rect.left;
-        if (x < third) left = true;
-        else if (x > third * 2) right = true;
-        else jump = true;
+        if (rotated) {
+          // 캔버스가 +90° 회전 → 게임 좌우가 화면 상하로 매핑. 화면 위=뒤로(왼쪽), 아래=앞으로(오른쪽)
+          const third = rect.height / 3;
+          const y = t.clientY - rect.top;
+          if (y < third) left = true;
+          else if (y > third * 2) right = true;
+          else jump = true;
+        } else {
+          const third = rect.width / 3;
+          const x = t.clientX - rect.left;
+          if (x < third) left = true;
+          else if (x > third * 2) right = true;
+          else jump = true;
+        }
       }
       engine.setInput({ left, right, jump });
     }
@@ -119,7 +130,7 @@ export function GameCanvas({ stage }: Props) {
       canvas.removeEventListener("touchend", sync);
       canvas.removeEventListener("touchcancel", sync);
     };
-  }, [isTouch]);
+  }, [isTouch, rotated]);
 
   useEffect(() => {
     fetchProgress().catch((e) => console.error("progress fetch failed", e));
@@ -281,8 +292,8 @@ export function GameCanvas({ stage }: Props) {
   const showNext = status === "won" && nextStageId !== null;
   const retryIsPrimary = !showNext;
   const showPauseButton =
-    status === "playing" && !manualPaused && !portrait && !showTouchGuide;
-  const showPauseOverlay = manualPaused && !portrait;
+    status === "playing" && !manualPaused && !showTouchGuide;
+  const showPauseOverlay = manualPaused;
 
   return (
     <div className="relative h-full w-full">
