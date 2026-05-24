@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { playClick } from "@/lib/sound";
 import type { Bundle, StageProgress } from "../types";
 
 const PAD_TOP = 60;
@@ -167,6 +168,7 @@ export function StageMap({ bundles, progress }: Props) {
               data-stage-status={status}
               className={cls}
               style={style}
+              onClick={() => playClick()}
             >
               {pos.stageIdx + 1}
             </Link>
