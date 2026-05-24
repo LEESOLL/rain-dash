@@ -20,7 +20,13 @@ const DEFAULT_PROGRESS: StageProgress = {
 // 서버(Firestore)에서 가져온 진행도를 담는 인메모리 캐시.
 // 동기 소비자(엔진·랭킹)는 이 캐시를 읽고, 영속화는 Firestore가 담당한다.
 let cache: StageProgress = DEFAULT_PROGRESS;
+// 서버에서 한 번이라도 진행도를 받아왔는지 — 재진입 시 로딩 스킵 판단용
+let progressLoaded = false;
 const listeners = new Set<() => void>();
+
+export function isProgressLoaded(): boolean {
+  return progressLoaded;
+}
 
 function notify() {
   for (const l of listeners) l();
@@ -52,6 +58,7 @@ export async function fetchProgress(): Promise<StageProgress> {
   cache = snap.exists()
     ? { ...DEFAULT_PROGRESS, ...(snap.data() as Partial<StageProgress>) }
     : DEFAULT_PROGRESS;
+  progressLoaded = true;
   notify();
   return cache;
 }

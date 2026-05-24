@@ -7,6 +7,7 @@ import {
   fetchProgress,
   getCachedProgress,
   getServerProgressSnapshot,
+  isProgressLoaded,
   subscribeProgress,
 } from "@/features/stage/stageProgressRepository";
 import { getBundles } from "@/features/stage/stageRepository";
@@ -19,11 +20,13 @@ type Props = {
 export function StageModal({ onClose }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isTouch = useIsTouch();
-  // 모바일: 범례가 노드와 겹쳐 ⓘ 버튼으로 토글
   const [legendOpen, setLegendOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => !isProgressLoaded());
 
   useEffect(() => {
-    fetchProgress().catch((e) => console.error("progress fetch failed", e));
+    fetchProgress()
+      .catch((e) => console.error("progress fetch failed", e))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const progress = useSyncExternalStore(
@@ -66,7 +69,15 @@ export function StageModal({ onClose }: Props) {
 
       <div className="relative flex min-h-dvh flex-col items-center px-4 py-12">
         <div className="w-full max-w-xl">
-          <StageMap bundles={bundles} progress={progress} />
+          {isLoading ? (
+            <div className="fixed inset-0 flex items-center justify-center px-4 text-center">
+              <span className="animate-pulse text-xl font-bold tracking-widest text-white [text-shadow:_0_1px_6px_rgb(0_0_0_/_60%)] sm:text-2xl">
+                스테이지 정보 불러오는 중 ...
+              </span>
+            </div>
+          ) : (
+            <StageMap bundles={bundles} progress={progress} />
+          )}
         </div>
       </div>
 
