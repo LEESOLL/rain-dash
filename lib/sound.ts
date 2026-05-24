@@ -62,6 +62,23 @@ function clearResume(): void {
   resumeHandler = null;
 }
 
+let visibilityBound = false;
+
+// 탭 전환·브라우저 최소화 시 BGM 일시정지, 복귀 시 재개 (엘리먼트는 유지)
+function ensureVisibilityHandler(): void {
+  if (visibilityBound || typeof document === "undefined") return;
+  visibilityBound = true;
+  document.addEventListener("visibilitychange", () => {
+    if (!bgmAudio) return;
+    if (document.hidden) {
+      bgmAudio.pause();
+    } else if (isAudioEnabled()) {
+      // 복귀 시 재개 — 막히면 다음 사용자 제스처에 재시도
+      bgmAudio.play().then(clearResume, () => armResume());
+    }
+  });
+}
+
 export function playBgm(src: string, volume = 0.5): void {
   bgmSrc = src;
   bgmVolume = volume;
@@ -74,6 +91,7 @@ export function playBgm(src: string, volume = 0.5): void {
     bgmAudio.volume = volume;
   }
   if (!bgmAudio) return;
+  ensureVisibilityHandler();
   armResume();
   bgmAudio.play().then(clearResume, (err: DOMException) => {
     if (err && err.name === "AbortError") clearResume();
