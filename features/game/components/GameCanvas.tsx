@@ -317,7 +317,7 @@ export function GameCanvas({ stage }: Props) {
       )}
 
       {showPauseButton && (
-        <div className="absolute right-4 top-4 z-10">
+        <div className="absolute bottom-4 right-4 z-10">
           <GameButton size="sm" onClick={() => setManualPaused(true)}>
             일시정지
           </GameButton>
