@@ -143,7 +143,7 @@ export function GameCanvas({ stage }: Props) {
 
   useEffect(() => {
     if (status === "playing") {
-      playBgm("/audio/gaming_bgm.mp3", 0.4);
+      playBgm("/audio/gaming_bgm.mp3", 0.3);
     } else {
       stopBgm();
     }

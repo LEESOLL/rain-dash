@@ -36,6 +36,7 @@ export function StageModal({ onClose }: Props) {
   );
 
   useEffect(() => {
+    if (isLoading) return;
     const root = scrollRef.current;
     if (!root) return;
     requestAnimationFrame(() => {
@@ -51,7 +52,7 @@ export function StageModal({ onClose }: Props) {
       }
       root.scrollTo({ top: root.scrollHeight });
     });
-  }, [progress]);
+  }, [progress, isLoading]);
 
   const bundles = getBundles();
 
