@@ -691,13 +691,6 @@ export function createEngine(config: EngineConfig): Engine {
     const H = canvas.height;
     ctx.fillStyle = "#bfe6f2";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "rgba(30,70,90,0.55)";
-    ctx.font = "24px 'PF Stardust', sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("LOADING...", W / 2, H / 2);
-    ctx.textAlign = "left";
-    ctx.textBaseline = "alphabetic";
   }
   function draw() {
     const W = canvas.width;

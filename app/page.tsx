@@ -67,8 +67,8 @@ export default function Home() {
 
   return (
     <>
-      <main className="relative flex h-dvh items-center justify-center overflow-hidden font-mono text-white">
-        <div className="animate-bg-slide pointer-events-none absolute inset-0 z-0 flex">
+      <main className="relative flex min-h-dvh items-center justify-center overflow-y-auto font-mono text-white">
+        <div className="animate-bg-slide pointer-events-none fixed inset-0 z-0 flex">
           <img
             src="/sprites/background/street-bg.png"
             alt=""
@@ -80,22 +80,23 @@ export default function Home() {
             className="h-full w-auto max-w-none select-none"
           />
         </div>
-        <div className="pointer-events-none absolute inset-0 z-0 bg-black/15" />
+        <div className="pointer-events-none fixed inset-0 z-0 bg-black/15" />
 
         {view === null && (
-          <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8">
+          <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8 py-[clamp(1rem,4vh,2rem)]">
             <div className="flex flex-col items-center text-center">
               <img
                 src="/sprites/ui/title.png"
                 alt="RAIN DASH"
-                className="animate-title-float w-[min(68vw,360px)] drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                className="animate-title-float w-[min(72vw,440px)] max-h-[40vh] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
               />
               <p className="mt-[-20px] text-base tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)] sm:text-lg">
                 time moves when you move
               </p>
             </div>
 
-            <div className="flex w-56 flex-col gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64">
+            {/* 세로(높은 화면): 1열, 가로모드(낮은 화면): 2x2 그리드 — 세로 공간 절약 */}
+            <div className="grid w-56 grid-cols-1 items-start gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64 [@media(max-height:500px)]:w-[min(88vw,460px)] [@media(max-height:500px)]:grid-cols-2 [@media(max-height:500px)]:gap-3">
               <GameButton variant="primary" size="lg" onClick={handleStart}>
                 게임 시작
               </GameButton>

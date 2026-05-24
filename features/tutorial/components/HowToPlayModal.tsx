@@ -59,7 +59,6 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
       subtitle="HOW TO PLAY"
       showClose
       maxWidth={560}
-      bodyClassName="max-h-[74vh] overflow-y-auto"
     >
       <div className="flex flex-col gap-5 pb-6 text-sky-900">
         <div className="flex flex-col gap-2">
