@@ -87,8 +87,8 @@ export function StageModal({ onClose }: Props) {
             <div className="stage-legend stage-legend--mobile">
               <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
               <LegendItem color="#6BD6AB" label="깬 스테이지" />
-              <LegendItem color="#FF9BBC" label="아직 깨기 전" />
-              <LegendItem color="#A8B0BB" label="준비 중" />
+              <LegendItem color="#A8B0BB" label="아직 깨기 전" />
+              <LegendItem color="#5F6B7A" label="준비 중" />
             </div>
           )}
           <button
@@ -104,8 +104,8 @@ export function StageModal({ onClose }: Props) {
         <div className="stage-legend">
           <LegendItem color="var(--color-yellow)" label="현재 스테이지" />
           <LegendItem color="#6BD6AB" label="깬 스테이지" />
-          <LegendItem color="#FF9BBC" label="아직 깨기 전" />
-          <LegendItem color="#A8B0BB" label="준비 중" />
+          <LegendItem color="#A8B0BB" label="아직 깨기 전" />
+          <LegendItem color="#5F6B7A" label="준비 중" />
         </div>
       )}
     </div>

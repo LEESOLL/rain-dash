@@ -680,15 +680,15 @@ a.stage-node:hover {
   background: #6bd6ab;
   text-shadow: 0 1.5px 0 rgba(20, 110, 80, 0.35);
 }
-/* 아직 깨기 전 — 핑크 */
+/* 아직 깨기 전 — 그레이 */
 .stage-node--locked {
-  background: #ff9bbc;
-  text-shadow: 0 1.5px 0 rgba(180, 60, 100, 0.35);
-}
-/* 준비 중 — 그레이 */
-.stage-node--placeholder {
   background: #a8b0bb;
   text-shadow: 0 1.5px 0 rgba(80, 90, 100, 0.4);
+}
+/* 준비 중 — 다크 그레이 */
+.stage-node--placeholder {
+  background: #5f6b7a;
+  text-shadow: 0 1.5px 0 rgba(30, 40, 50, 0.45);
 }
 /* 현재 깰 차례 — 옐로우 + 살짝 크게 + 바운스 */
 .stage-node--current {
