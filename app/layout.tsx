@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-// 임시 비활성화: import { OrientationGate } from "@/components/OrientationGate";
 import "./globals.css";
 
 const DESCRIPTION = "Time moves when you move! 빨리 갈까 천천히 갈까?";
@@ -38,8 +37,6 @@ export default function RootLayout({
     <html lang="ko" className="h-full">
       <body className="min-h-dvh">
         {children}
-        {/* 임시 비활성화: 세로 모드 가로 권장 모달 */}
-        {/* <OrientationGate /> */}
       </body>
     </html>
   );

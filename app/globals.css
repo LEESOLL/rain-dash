@@ -129,21 +129,6 @@ img[data-pixel] {
   will-change: transform;
 }
 
-@keyframes rotate-hint {
-  0%,
-  35% {
-    transform: rotate(0deg);
-  }
-  65%,
-  100% {
-    transform: rotate(-90deg);
-  }
-}
-
-.animate-rotate-hint {
-  animation: rotate-hint 1.8s ease-in-out infinite;
-}
-
 /* 메인 타이틀 위아래 플로팅 */
 @keyframes title-float {
   0%,
