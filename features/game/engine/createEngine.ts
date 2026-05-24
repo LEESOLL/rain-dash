@@ -2,7 +2,7 @@ import { playSoundEffect } from "@/lib/sound";
 import * as repo from "@/features/stage/stageProgressRepository";
 import * as T from "./tuning";
 import type { Item, ItemType, Puddle, Shelter } from "@/features/stage/types";
-import type { Engine, EngineConfig, GameState, Input } from "./types";
+import type { Engine, EngineConfig, GameState } from "./types";
 
 export function createEngine(config: EngineConfig): Engine {
   const { canvas, stage, onStateChange, onReady, onProgress } = config;
@@ -114,6 +114,7 @@ export function createEngine(config: EngineConfig): Engine {
   const RUN_DISTANCE_PER_FRAME = 15;
   const RUN_TARGET_DISPLAY_H = 90;
   const IDLE_TARGET_DISPLAY_H = 90;
+  const UMBRELLA_HEIGHT_SCALE = 1.2;
   const runFrames: HTMLCanvasElement[] = [];
   let runFrameW = 1;
   let runFrameH = 1;
@@ -997,7 +998,8 @@ export function createEngine(config: EngineConfig): Engine {
         frameH = runFrameH;
       }
       if (frame) {
-        const SPRITE_H = targetH;
+        const SPRITE_H =
+          targetH * (activeEffect === "umbrella" ? UMBRELLA_HEIGHT_SCALE : 1);
         const SPRITE_W = (SPRITE_H * frameW) / frameH;
         const destY = Math.round(T["GROUND_Y"] - state.py - SPRITE_H);
         if (state.facing === -1) {
