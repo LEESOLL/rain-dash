@@ -12,59 +12,17 @@ export function createEngine(config: EngineConfig): Engine {
     right: false,
     jump: false,
   };
-  function generateItems(puddles: Puddle[]) {
-    const types: ItemType[] = ["heart", "umbrella", "boots", "raincoat"];
-    const items = [];
-    let x = 350 + Math.random() * 200;
-    while (x < stage.goalDistance - 250) {
-      const nearShelter = stage.shelters.some((s) => Math.abs(s.x - x) < 190);
-      const nearPuddle = puddles.some(
-        (p) => x > p.x - 45 && x < p.x + p.width + 45,
-      );
-      if (!nearShelter && !nearPuddle) {
-        const type = types[Math.floor(Math.random() * types.length)];
-        const r = Math.random();
-        let y;
-        if (r < 0.5) y = 45 + Math.random() * 45;
-        else if (r < 0.85) y = 90 + Math.random() * 50;
-        else y = 140 + Math.random() * 40;
-        items.push({
-          x: Math.round(x),
-          y: Math.round(y),
-          type,
-        });
-        x += 360 + Math.random() * 280;
-      } else {
-        x += 110;
-      }
-    }
-    return items;
-  }
-  function generatePuddles() {
-    const puddles = [];
-    let x = 500 + Math.random() * 400;
-    while (x < stage.goalDistance - 200) {
-      const width = Math.random() < 0.4 ? 135 : 72;
-      const overlapsShelter = stage.shelters.some(
-        (s) => x < s.x + 100 && x + width > s.x - 100,
-      );
-      if (!overlapsShelter) {
-        puddles.push({
-          x: Math.round(x),
-          width,
-        });
-      }
-      x += 550 + Math.random() * 550;
-    }
-    return puddles;
+  function puddleWidth(p: Puddle): number {
+    return p.size === "long" ? T["PUDDLE_WIDTH_LONG"] : T["PUDDLE_WIDTH_SHORT"];
   }
   function initialState(): GameState {
     const initNext = stage.lightning
       ? stage.lightning.gap.min +
         Math.random() * (stage.lightning.gap.max - stage.lightning.gap.min)
       : 0;
-    const puddles = generatePuddles();
-    const items = generateItems(puddles);
+    // 웅덩이·아이템은 스테이지 데이터로 고정(공정성), 비·번개만 난이도별 랜덤
+    const puddles = stage.puddles.map((p) => ({ ...p }));
+    const items = stage.items.map((it) => ({ ...it }));
     return {
       px: 30,
       py: 0,
@@ -587,9 +545,10 @@ export function createEngine(config: EngineConfig): Engine {
     }
     if (state.onGround) {
       for (const p of state.puddles) {
+        const pw = puddleWidth(p);
         if (
           state.px + T["PLAYER_WIDTH"] / 2 > p.x &&
-          state.px - T["PLAYER_WIDTH"] / 2 < p.x + p.width
+          state.px - T["PLAYER_WIDTH"] / 2 < p.x + pw
         ) {
           if (!absorbPuddle()) applyDamage();
           break;
@@ -744,16 +703,16 @@ export function createEngine(config: EngineConfig): Engine {
     }
     for (const p of state.puddles) {
       const sx = p.x - cam;
-      if (sx + p.width < 0 || sx > W) continue;
-      const isLong = p.width >= 100;
+      const drawW = puddleWidth(p);
+      if (sx + drawW < 0 || sx > W) continue;
+      const isLong = p.size === "long";
       const pFrames = isLong ? puddleLongFrames : puddleShortFrames;
       const pfw = isLong ? puddleLongFrameW : puddleShortFrameW;
       const pfh = isLong ? puddleLongFrameH : puddleShortFrameH;
       if (pFrames.length > 0) {
         const f = pFrames[0];
-        const drawW = p.width;
         const drawH = (drawW * pfh) / pfw;
-        const drawY = Math.round(T["GROUND_Y"] - drawH * 1.0);
+        const drawY = Math.round(T["GROUND_Y"] - drawH + 10);
         ctx.drawImage(f, Math.round(sx), drawY, drawW, drawH);
       }
     }

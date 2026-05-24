@@ -16,7 +16,7 @@ export type Shelter = {
 
 export type Puddle = {
   x: number;
-  width: number;
+  size: "short" | "long";
 };
 
 export type Item = {

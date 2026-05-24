@@ -17,6 +17,9 @@ export const STILL_TIME_SCALE = 0.1;
 export const AUTO_SCROLL_SPEED = 55;
 export const PLAYER_SCREEN_LIMIT_RATIO = 0.5;
 
+export const PUDDLE_WIDTH_SHORT = 72;
+export const PUDDLE_WIDTH_LONG = PUDDLE_WIDTH_SHORT * 2;
+
 export const RAIN_VX = -90;
 export const RAIN_VY = 540;
 export const RAIN_STREAK_LENGTH = 30;

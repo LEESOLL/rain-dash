@@ -68,7 +68,9 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
             <div className="flex flex-wrap gap-2">
               <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
                 <span className="font-bold text-sky-500">화면 왼쪽</span>
-                <span className="text-sm font-medium text-sky-900/80">뒤로</span>
+                <span className="text-sm font-medium text-sky-900/80">
+                  뒤로
+                </span>
               </div>
               <div className="flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2">
                 <span className="font-bold text-sky-500">화면 오른쪽</span>
@@ -175,7 +177,7 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
             <div className="flex shrink-0 items-end gap-2">
               <img
                 src="/sprites/objects/awning.png"
-                alt="처마"
+                alt="가게"
                 className="h-10 w-10 object-contain [image-rendering:pixelated]"
               />
               <img
@@ -190,7 +192,7 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
               />
             </div>
             <div className="text-xs leading-relaxed text-sky-900/70">
-              처마 · 버스정류장 · 공중전화 아래로 들어가면 비를 피해요.{" "}
+              가게 · 버스정류장 · 공중전화 아래로 들어가면 비를 피해요.{" "}
               <b className="text-sky-500">단, 번개는 못 막아요.</b>
             </div>
           </div>
