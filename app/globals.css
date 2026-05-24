@@ -830,12 +830,15 @@ a.stage-node--current:hover {
   position: absolute;
   inset: 0;
   z-index: 20;
+  /* 게임 박스 높이 기준(cqh)으로 내부 요소를 비율 축소해 스크롤 없이 한 화면에 맞춤 */
+  container-type: size;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  padding: 24px;
+  overflow: hidden;
+  gap: clamp(8px, 3cqh, 28px);
+  padding: clamp(10px, 3cqh, 24px);
   background: rgba(11, 58, 82, 0.55);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
@@ -843,7 +846,7 @@ a.stage-node--current:hover {
 }
 .result-title {
   font-family: "PF Stardust", sans-serif;
-  font-size: clamp(40px, 7vw, 64px);
+  font-size: clamp(28px, 10cqh, 64px);
   font-weight: 800;
   letter-spacing: 4px;
   color: #ffffff;
@@ -864,10 +867,10 @@ a.stage-node--current:hover {
   backdrop-filter: blur(18px) saturate(1.1);
   border: 2px solid #ffffff;
   border-radius: 24px;
-  padding: 26px 30px;
+  padding: clamp(12px, 3.5cqh, 26px) clamp(18px, 5cqw, 30px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: clamp(4px, 1.6cqh, 10px);
   box-shadow: var(--shadow-3);
   color: #fff;
 }
@@ -875,7 +878,7 @@ a.stage-node--current:hover {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  font-size: 22px;
+  font-size: clamp(14px, 4.2cqh, 22px);
   letter-spacing: 0.5px;
   text-shadow: 0 2px 0 rgba(11, 58, 82, 0.4);
   transition: opacity 220ms ease;
@@ -930,9 +933,9 @@ a.stage-node--current:hover {
   justify-content: center;
 }
 .result-sub {
-  margin-top: -12px;
+  margin-top: clamp(-12px, -1.5cqh, -4px);
   font-family: "PF Stardust", sans-serif;
-  font-size: 15px;
+  font-size: clamp(12px, 3.6cqh, 16px);
   letter-spacing: 0.5px;
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 2px 4px rgba(11, 58, 82, 0.5);
