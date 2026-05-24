@@ -421,6 +421,15 @@ export function createEngine(config: EngineConfig): Engine {
       top: T["GROUND_Y"] - 25 - drawH,
     };
   }
+  function houseRoof() {
+    const drawH = 210;
+    const drawW = (drawH * houseFrameW) / houseFrameH;
+    return {
+      left: stage.goalDistance - drawW / 2,
+      right: stage.goalDistance + drawW / 2,
+      top: T["GROUND_Y"] - 25 - drawH + drawH * 0.12,
+    };
+  }
   function applyDamage() {
     if (state.iframeT > 0) return;
     playSoundEffect(hurtAudio);
@@ -588,6 +597,8 @@ export function createEngine(config: EngineConfig): Engine {
     const playerRight = state.px + T["PLAYER_WIDTH"] / 2;
     const playerTopY = T["GROUND_Y"] - state.py - T["PLAYER_HITBOX_HEIGHT"];
     const playerBottomY = T["GROUND_Y"] - state.py;
+    // 쉘터와 집 모두 지붕 아래로는 비를 막음
+    const roofs = [...stage.shelters.map(shelterRoof), houseRoof()];
     for (let i = state.drops.length - 1; i >= 0; i--) {
       const d = state.drops[i];
       d.x += T["RAIN_VX"] * dt * ts;
@@ -597,8 +608,7 @@ export function createEngine(config: EngineConfig): Engine {
         continue;
       }
       let consumed = false;
-      for (const s of stage.shelters) {
-        const r = shelterRoof(s);
+      for (const r of roofs) {
         if (d.y >= r.top && d.x >= r.left && d.x <= r.right) {
           state.drops.splice(i, 1);
           consumed = true;
@@ -732,33 +742,6 @@ export function createEngine(config: EngineConfig): Engine {
         }
       }
     }
-    for (const it of state.items) {
-      const sx = it.x - cam;
-      if (sx + T["ITEM_SIZE"] < 0 || sx - T["ITEM_SIZE"] > W) continue;
-      const yBottom = T["GROUND_Y"] - it.y;
-      let itemFrames = null;
-      if (it.type === "heart") {
-        itemFrames = heartFrames;
-      } else if (it.type === "umbrella") {
-        itemFrames = umbrellaFrames;
-      } else if (it.type === "boots") {
-        itemFrames = bootsFrames;
-      } else if (it.type === "raincoat") {
-        itemFrames = raincoatItemFrames;
-      }
-      if (itemFrames && itemFrames.length > 0) {
-        const idx =
-          itemFrames.length > 1
-            ? Math.floor(state.realT * ITEM_FPS) % itemFrames.length
-            : 0;
-        const f = itemFrames[idx];
-        const [drawW, drawH] = itemDrawSize(it.type);
-        const drawLeft = Math.round(sx - drawW / 2);
-        const drawTop = Math.round(yBottom - drawH);
-        ctx.drawImage(f, drawLeft, drawTop, drawW, drawH);
-      }
-    }
-    const ts = getTimeScale();
     const playerVxRaw = input.right && !input.left ? T["PLAYER_SPEED"] : 0;
     const appVx = T["RAIN_VX"] - playerVxRaw;
     const appVy = T["RAIN_VY"];
@@ -816,6 +799,33 @@ export function createEngine(config: EngineConfig): Engine {
             drawH,
           );
         }
+      }
+    }
+    // 아이템은 쉘터보다 위에 그려야 가게 지붕에 가려지지 않음
+    for (const it of state.items) {
+      const sx = it.x - cam;
+      if (sx + T["ITEM_SIZE"] < 0 || sx - T["ITEM_SIZE"] > W) continue;
+      const yBottom = T["GROUND_Y"] - it.y;
+      let itemFrames = null;
+      if (it.type === "heart") {
+        itemFrames = heartFrames;
+      } else if (it.type === "umbrella") {
+        itemFrames = umbrellaFrames;
+      } else if (it.type === "boots") {
+        itemFrames = bootsFrames;
+      } else if (it.type === "raincoat") {
+        itemFrames = raincoatItemFrames;
+      }
+      if (itemFrames && itemFrames.length > 0) {
+        const idx =
+          itemFrames.length > 1
+            ? Math.floor(state.realT * ITEM_FPS) % itemFrames.length
+            : 0;
+        const f = itemFrames[idx];
+        const [drawW, drawH] = itemDrawSize(it.type);
+        const drawLeft = Math.round(sx - drawW / 2);
+        const drawTop = Math.round(yBottom - drawH);
+        ctx.drawImage(f, drawLeft, drawTop, drawW, drawH);
       }
     }
     const warnSec = stage.lightning?.warnSec ?? T["LIGHTNING_WARN_DURATION"];
