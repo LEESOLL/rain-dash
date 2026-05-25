@@ -339,18 +339,28 @@ export function createEngine(config: EngineConfig): Engine {
       phoneBoothFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/effects/thunder.webp", 1, thunderFrames, (w, h) => {
-    thunderFrameW = w;
-    thunderFrameH = h;
-  });
+  loadSpriteFrames(
+    "/sprites/effects/thunder.webp",
+    1,
+    thunderFrames,
+    (w, h) => {
+      thunderFrameW = w;
+      thunderFrameH = h;
+    },
+  );
   loadSpriteFrames("/sprites/items/heart.webp", 1, heartFrames, (w, h) => {
     heartFrameW = w;
     heartFrameH = h;
   });
-  loadSpriteFrames("/sprites/items/umbrella.webp", 1, umbrellaFrames, (w, h) => {
-    umbrellaFrameW = w;
-    umbrellaFrameH = h;
-  });
+  loadSpriteFrames(
+    "/sprites/items/umbrella.webp",
+    1,
+    umbrellaFrames,
+    (w, h) => {
+      umbrellaFrameW = w;
+      umbrellaFrameH = h;
+    },
+  );
   loadSpriteFrames("/sprites/items/boots.webp", 1, bootsFrames, (w, h) => {
     bootsFrameW = w;
     bootsFrameH = h;
@@ -861,12 +871,25 @@ export function createEngine(config: EngineConfig): Engine {
           );
         }
       } else {
-        // 번개가 내려온 뒤: 바닥에 잔광색 타원만 반짝거리며 잦아듦
+        // 번개가 내려온 뒤: 번개 모양(세로 볼트) 잔상 + 바닥 잔광이 함께 반짝이며 잦아듦
         const w = T["LIGHTNING_WIDTH"];
         const p = Math.max(0, ev.t / T["LIGHTNING_LINGER_DURATION"]); // 1 → 0
         const blink = Math.floor(state.realT * 28) % 2 === 0 ? 1 : 0.45;
         const a = p * blink;
-        // 잔광색 타원 (전기 옐로우-화이트)
+        // 번개 모양 잔상 (충돌 판정 없음 — 맞아도 안전)
+        if (thunderFrames.length > 0) {
+          ctx.save();
+          ctx.globalAlpha = a;
+          ctx.drawImage(
+            thunderFrames[0],
+            Math.round(sx - w / 2),
+            0,
+            w,
+            T["GROUND_Y"],
+          );
+          ctx.restore();
+        }
+        // 바닥 잔광 타원 (전기 옐로우-화이트)
         ctx.fillStyle = `rgba(255,240,170,${a * 0.4})`;
         ctx.beginPath();
         ctx.ellipse(sx, T["GROUND_Y"], w * 1.2, 13, 0, 0, Math.PI * 2);
