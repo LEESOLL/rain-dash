@@ -97,7 +97,7 @@ export default function Home() {
 
             {/* 세로(높은 화면): 1열, 가로모드(낮은 화면): 2x2 그리드 — 세로 공간 절약 */}
             <div className="grid w-56 grid-cols-1 items-start gap-[clamp(0.5rem,1.5vh,0.75rem)] sm:w-64 [@media(max-height:500px)]:w-[min(88vw,460px)] [@media(max-height:500px)]:grid-cols-2 [@media(max-height:500px)]:gap-3">
-              <GameButton variant="primary" size="lg" onClick={handleStart}>
+              <GameButton variant="primary" size="md" onClick={handleStart}>
                 게임 시작
               </GameButton>
               <GameButton size="md" onClick={() => setHowtoOpen(true)}>
