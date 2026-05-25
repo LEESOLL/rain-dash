@@ -70,12 +70,12 @@ export default function Home() {
       <main className="relative flex min-h-dvh items-center justify-center overflow-y-auto font-mono text-white">
         <div className="animate-bg-slide pointer-events-none fixed inset-0 z-0 flex">
           <img
-            src="/sprites/background/street-bg.png"
+            src="/sprites/background/street-bg.webp"
             alt=""
             className="h-full w-auto max-w-none select-none"
           />
           <img
-            src="/sprites/background/street-bg.png"
+            src="/sprites/background/street-bg.webp"
             alt=""
             className="h-full w-auto max-w-none select-none"
           />
@@ -86,7 +86,7 @@ export default function Home() {
           <div className="relative z-10 flex flex-col items-center gap-[clamp(1rem,4vh,2rem)] px-8 py-[clamp(1rem,4vh,2rem)]">
             <div className="flex flex-col items-center text-center">
               <img
-                src="/sprites/ui/title.png"
+                src="/sprites/ui/title.webp"
                 alt="RAIN DASH"
                 className="animate-title-float w-[min(72vw,440px)] max-h-[40vh] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
               />

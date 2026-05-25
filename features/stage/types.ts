@@ -40,20 +40,11 @@ export type Stage = {
 
 export type BundleStatus = "available" | "coming-soon";
 
-export type Theme = {
-  backgroundImage: string;
-  shelterSprites: Record<ShelterVariant, string>;
-  puddleSprite: string;
-  itemSprites: Record<ItemType, string>;
-  bgm: string;
-};
-
 export type Bundle = {
   id: string;
   name: string;
   stageIds: string[];
   status: BundleStatus;
-  theme?: Theme;
 };
 
 export type StageProgress = {

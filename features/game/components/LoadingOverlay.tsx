@@ -40,7 +40,7 @@ export function LoadingOverlay({ progress }: Props) {
         ))}
       </div>
       <img
-        src="/sprites/ui/title.png"
+        src="/sprites/ui/title.webp"
         alt="RAIN DASH"
         className="game-loading__logo"
       />

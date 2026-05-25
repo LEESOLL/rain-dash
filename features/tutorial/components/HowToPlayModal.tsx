@@ -124,22 +124,22 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
           <SectionLabel>아이템</SectionLabel>
           <div className="grid grid-cols-2 gap-2">
             <Cell
-              src="/sprites/items/umbrella.png"
+              src="/sprites/items/umbrella.webp"
               name="우산"
               desc="비를 막아줘요"
             />
             <Cell
-              src="/sprites/items/boots.png"
+              src="/sprites/items/boots.webp"
               name="장화"
               desc="웅덩이를 막아줘요"
             />
             <Cell
-              src="/sprites/items/raincoat.png"
+              src="/sprites/items/raincoat.webp"
               name="우비"
               desc="비·웅덩이 모두 막아요"
             />
             <Cell
-              src="/sprites/items/heart.png"
+              src="/sprites/items/heart.webp"
               name="하트"
               desc="목숨을 1 회복해요"
             />
@@ -153,17 +153,17 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
           <SectionLabel>주의</SectionLabel>
           <div className="grid grid-cols-2 gap-2">
             <Cell
-              src="/sprites/effects/rain.png"
+              src="/sprites/effects/rain.webp"
               name="비"
               desc="맞으면 목숨이 줄어요"
             />
             <Cell
-              src="/sprites/effects/thunder.png"
+              src="/sprites/effects/thunder.webp"
               name="번개"
               desc="무조건 목숨↓ · 직접 피하기"
             />
             <Cell
-              src="/sprites/effects/puddle_short.png"
+              src="/sprites/effects/puddle_short.webp"
               name="웅덩이"
               desc="점프로 넘으세요"
             />
@@ -175,17 +175,17 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
           <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-3 py-2">
             <div className="flex shrink-0 items-end gap-2">
               <img
-                src="/sprites/objects/awning.png"
+                src="/sprites/objects/awning.webp"
                 alt="가게"
                 className="h-10 w-10 object-contain [image-rendering:pixelated]"
               />
               <img
-                src="/sprites/objects/bus_stop.png"
+                src="/sprites/objects/bus_stop.webp"
                 alt="버스정류장"
                 className="h-10 w-10 object-contain [image-rendering:pixelated]"
               />
               <img
-                src="/sprites/objects/phone_booth.png"
+                src="/sprites/objects/phone_booth.webp"
                 alt="공중전화"
                 className="h-10 w-10 object-contain [image-rendering:pixelated]"
               />
@@ -199,7 +199,7 @@ export function HowToPlayModal({ isOpen, onClose }: Props) {
 
         <div className="flex items-center gap-3 rounded-2xl border border-sky-200 bg-sky-50/80 px-4 py-2">
           <img
-            src="/sprites/objects/house.png"
+            src="/sprites/objects/house.webp"
             alt="집"
             className="h-10 w-10 shrink-0 object-contain [image-rendering:pixelated]"
           />

@@ -11,22 +11,6 @@ export const BUNDLES: Bundle[] = [
       "rainy_street-04",
     ],
     status: "available",
-    theme: {
-      backgroundImage: "/sprites/background/street-bg.png",
-      shelterSprites: {
-        busStop: "/sprites/objects/bus_stop.png",
-        awning: "/sprites/objects/awning.png",
-        phoneBooth: "/sprites/objects/phone_booth.png",
-      },
-      puddleSprite: "/sprites/effects/puddle_short.png",
-      itemSprites: {
-        heart: "/sprites/items/heart.png",
-        raincoat: "/sprites/items/raincoat.png",
-        umbrella: "/sprites/items/umbrella.png",
-        boots: "/sprites/items/boots.png",
-      },
-      bgm: "/audio/gaming_bgm.mp3",
-    },
   },
   {
     id: "snow_street",

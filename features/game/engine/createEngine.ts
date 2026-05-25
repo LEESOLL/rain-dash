@@ -158,7 +158,7 @@ export function createEngine(config: EngineConfig): Engine {
       assetLoaded();
     };
     img.onerror = assetLoaded;
-    img.src = "/sprites/background/street-bg.png";
+    img.src = "/sprites/background/street-bg.webp";
   }
   function loadSpriteFrames(
     src: string,
@@ -251,7 +251,7 @@ export function createEngine(config: EngineConfig): Engine {
     img.src = src;
   }
   loadSpriteFrames(
-    "/sprites/character/run.png",
+    "/sprites/character/run.webp",
     RUN_FRAMES,
     runFrames,
     (w, h) => {
@@ -259,12 +259,12 @@ export function createEngine(config: EngineConfig): Engine {
       runFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/character/idle.png", 1, idleFrames, (w, h) => {
+  loadSpriteFrames("/sprites/character/idle.webp", 1, idleFrames, (w, h) => {
     idleFrameW = w;
     idleFrameH = h;
   });
   loadSpriteFrames(
-    "/sprites/character/raincoat_run.png",
+    "/sprites/character/raincoat_run.webp",
     RUN_FRAMES,
     raincoatRunFrames,
     (w, h) => {
@@ -273,7 +273,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/character/umbrella_run.png",
+    "/sprites/character/umbrella_run.webp",
     RUN_FRAMES,
     umbrellaRunFrames,
     (w, h) => {
@@ -282,7 +282,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/character/boots_run.png",
+    "/sprites/character/boots_run.webp",
     RUN_FRAMES,
     bootsRunFrames,
     (w, h) => {
@@ -291,7 +291,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/character/raincoat_idle.png",
+    "/sprites/character/raincoat_idle.webp",
     1,
     raincoatIdleFrames,
     (w, h) => {
@@ -300,7 +300,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/character/boots_idle.png",
+    "/sprites/character/boots_idle.webp",
     1,
     bootsIdleFrames,
     (w, h) => {
@@ -309,7 +309,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/character/umbrella_idle.png",
+    "/sprites/character/umbrella_idle.webp",
     1,
     umbrellaIdleFrames,
     (w, h) => {
@@ -318,7 +318,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/objects/bus_stop.png",
+    "/sprites/objects/bus_stop.webp",
     1,
     busStopFrames,
     (w, h) => {
@@ -326,12 +326,12 @@ export function createEngine(config: EngineConfig): Engine {
       busStopFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/objects/awning.png", 1, awningFrames, (w, h) => {
+  loadSpriteFrames("/sprites/objects/awning.webp", 1, awningFrames, (w, h) => {
     awningFrameW = w;
     awningFrameH = h;
   });
   loadSpriteFrames(
-    "/sprites/objects/phone_booth.png",
+    "/sprites/objects/phone_booth.webp",
     1,
     phoneBoothFrames,
     (w, h) => {
@@ -339,24 +339,24 @@ export function createEngine(config: EngineConfig): Engine {
       phoneBoothFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/effects/thunder.png", 1, thunderFrames, (w, h) => {
+  loadSpriteFrames("/sprites/effects/thunder.webp", 1, thunderFrames, (w, h) => {
     thunderFrameW = w;
     thunderFrameH = h;
   });
-  loadSpriteFrames("/sprites/items/heart.png", 1, heartFrames, (w, h) => {
+  loadSpriteFrames("/sprites/items/heart.webp", 1, heartFrames, (w, h) => {
     heartFrameW = w;
     heartFrameH = h;
   });
-  loadSpriteFrames("/sprites/items/umbrella.png", 1, umbrellaFrames, (w, h) => {
+  loadSpriteFrames("/sprites/items/umbrella.webp", 1, umbrellaFrames, (w, h) => {
     umbrellaFrameW = w;
     umbrellaFrameH = h;
   });
-  loadSpriteFrames("/sprites/items/boots.png", 1, bootsFrames, (w, h) => {
+  loadSpriteFrames("/sprites/items/boots.webp", 1, bootsFrames, (w, h) => {
     bootsFrameW = w;
     bootsFrameH = h;
   });
   loadSpriteFrames(
-    "/sprites/items/raincoat.png",
+    "/sprites/items/raincoat.webp",
     1,
     raincoatItemFrames,
     (w, h) => {
@@ -364,12 +364,12 @@ export function createEngine(config: EngineConfig): Engine {
       raincoatItemFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/effects/rain.png", 1, rainFrames, (w, h) => {
+  loadSpriteFrames("/sprites/effects/rain.webp", 1, rainFrames, (w, h) => {
     rainFrameW = w;
     rainFrameH = h;
   });
   loadSpriteFrames(
-    "/sprites/effects/puddle_short.png",
+    "/sprites/effects/puddle_short.webp",
     1,
     puddleShortFrames,
     (w, h) => {
@@ -378,7 +378,7 @@ export function createEngine(config: EngineConfig): Engine {
     },
   );
   loadSpriteFrames(
-    "/sprites/effects/puddle_long.png",
+    "/sprites/effects/puddle_long.webp",
     1,
     puddleLongFrames,
     (w, h) => {
@@ -386,7 +386,7 @@ export function createEngine(config: EngineConfig): Engine {
       puddleLongFrameH = h;
     },
   );
-  loadSpriteFrames("/sprites/objects/house.png", 1, houseFrames, (w, h) => {
+  loadSpriteFrames("/sprites/objects/house.webp", 1, houseFrames, (w, h) => {
     houseFrameW = w;
     houseFrameH = h;
   });

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Rain Dash",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Rain Dash",
     description: DESCRIPTION,
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
   },
 };
 
