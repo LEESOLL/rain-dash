@@ -8,6 +8,7 @@ import { GameButton } from "@/components/GameButton";
 import { Modal } from "@/components/Modal";
 import { ToggleButton } from "@/components/ToggleButton";
 import { isAudioEnabled, setAudioPref } from "@/lib/sound";
+import { useIsTouch } from "@/lib/touch";
 
 type Props = {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const [sound, setSound] = useState<boolean>(() => isAudioEnabled());
   const [confirmReset, setConfirmReset] = useState(false);
+  const isTouch = useIsTouch();
 
   function handleSoundToggle(next: boolean) {
     setSound(next);
@@ -48,9 +50,18 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
       subtitle="SETTINGS"
       showClose
       footer={
-        <GameButton block onClick={onClose}>
-          닫기
-        </GameButton>
+        <>
+          {isTouch && (
+            <p className="text-center text-xs leading-relaxed text-[var(--color-danger-500)]">
+              모바일에서는 닉네임 설정이 불가능합니다.
+              <br />
+              닉네임 설정은 PC로 접속해 주세요.
+            </p>
+          )}
+          <GameButton block onClick={onClose}>
+            닫기
+          </GameButton>
+        </>
       }
     >
       <div className="setting-row">
