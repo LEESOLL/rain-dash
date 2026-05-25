@@ -90,7 +90,7 @@ export default function Home() {
                 alt="RAIN DASH"
                 className="animate-title-float w-[min(72vw,440px)] max-h-[40vh] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
               />
-              <p className="mt-[-20px] text-base tracking-wider opacity-80 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)] sm:text-lg">
+              <p className="mt-[-20px] text-xl font-semibold tracking-wider opacity-90 [text-shadow:_0_1px_4px_rgb(0_0_0_/_85%)] sm:text-2xl md:text-3xl">
                 time moves when you move
               </p>
             </div>
