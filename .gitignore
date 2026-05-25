@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # project notes (local only)
-/docs/
+/docs/specs/
 
 # auto-generated AI agent guides (local only)
 /CLAUDE.md
