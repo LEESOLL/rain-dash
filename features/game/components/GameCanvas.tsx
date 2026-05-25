@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { submitMyScore } from "@/features/ranking/rankingRepository";
-import { fetchProgress } from "@/features/stage/stageProgressRepository";
+import {
+  fetchProgress,
+  incrementAttemptCount,
+} from "@/features/stage/stageProgressRepository";
 import { getNextStageId } from "@/features/stage/stageRepository";
 import { setMainView } from "@/lib/mainView";
 import { useIsPortrait } from "@/lib/orientation";
@@ -36,6 +39,8 @@ export function GameCanvas({ stage }: Props) {
   // 표시용 진행률 = min(실제 로딩률, 경과시간/최소시간) — 캐시로 너무 빨리 끝나도 부드럽게
   const [displayProgress, setDisplayProgress] = useState(0);
   const loadedRef = useRef(0);
+  // 시도 횟수를 스테이지 진입당 1회만 세기 위한 가드 (strict 모드 이중 마운트·다음 스테이지 전환 대응)
+  const lastAttemptStageRef = useRef<string | null>(null);
   const [result, setResult] = useState<ResultData | null>(null);
   // 결과 카운트업 애니메이션 진행 시간(초)
   const [anim, setAnim] = useState(0);
@@ -220,6 +225,14 @@ export function GameCanvas({ stage }: Props) {
     engine.start();
     engine.setPaused(pausedRef.current);
 
+    // 스테이지 진입(첫 시작) 1회 시도 카운트 — stage.id 기준 가드로 중복 방지
+    if (lastAttemptStageRef.current !== stage.id) {
+      lastAttemptStageRef.current = stage.id;
+      incrementAttemptCount(stage.id).catch((e) =>
+        console.error("attempt count failed", e),
+      );
+    }
+
     function onKeyDown(e: KeyboardEvent) {
       if (e.code === "ArrowLeft" || e.code === "KeyA") {
         engine.setInput({ left: true });
@@ -237,6 +250,9 @@ export function GameCanvas({ stage }: Props) {
       } else if (e.code === "KeyR") {
         const s = engine.getState();
         if (s.status === "dead" || s.status === "won") {
+          incrementAttemptCount(stage.id).catch((err) =>
+            console.error("attempt count failed", err),
+          );
           engine.restart();
         }
         e.preventDefault();
@@ -277,6 +293,9 @@ export function GameCanvas({ stage }: Props) {
     router.replace("/");
   }
   function handleRetry() {
+    incrementAttemptCount(stage.id).catch((e) =>
+      console.error("attempt count failed", e),
+    );
     engineRef.current?.restart();
   }
   function handleNext() {
