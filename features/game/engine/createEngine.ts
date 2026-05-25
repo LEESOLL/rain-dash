@@ -24,7 +24,7 @@ export function createEngine(config: EngineConfig): Engine {
     const puddles = stage.puddles.map((p) => ({ ...p }));
     const items = stage.items.map((it) => ({ ...it }));
     return {
-      px: 30,
+      px: 200,
       py: 0,
       vy: 0,
       onGround: true,

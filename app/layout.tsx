@@ -73,6 +73,21 @@ export default function RootLayout({
           href="/sprites/background/street-bg.webp"
           as="image"
         />
+        {[
+          "/sprites/items/umbrella.webp",
+          "/sprites/items/boots.webp",
+          "/sprites/items/raincoat.webp",
+          "/sprites/items/heart.webp",
+          "/sprites/effects/rain.webp",
+          "/sprites/effects/thunder.webp",
+          "/sprites/effects/puddle_short.webp",
+          "/sprites/objects/awning.webp",
+          "/sprites/objects/bus_stop.webp",
+          "/sprites/objects/phone_booth.webp",
+          "/sprites/objects/house.webp",
+        ].map((href) => (
+          <link key={href} rel="prefetch" as="image" href={href} />
+        ))}
         <InteractionGuard />
         {children}
       </body>
