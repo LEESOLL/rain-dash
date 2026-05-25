@@ -8,12 +8,7 @@ const EMPTY: RankEntry[] = [];
 
 let cumulativeCache: RankEntry[] = EMPTY;
 const bundleCache = new Map<string, RankEntry[]>();
-let rankingLoaded = false;
 const listeners = new Set<() => void>();
-
-export function isRankingLoaded(): boolean {
-  return rankingLoaded;
-}
 
 function notify() {
   for (const l of listeners) l();
@@ -39,7 +34,6 @@ export function refreshRanking(): Promise<void> {
   return fetchCumulativeRanking()
     .then((entries) => {
       cumulativeCache = entries;
-      rankingLoaded = true;
       notify();
     })
     .catch((e) => console.error("cumulative ranking fetch failed", e));

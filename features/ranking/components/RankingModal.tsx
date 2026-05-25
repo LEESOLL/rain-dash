@@ -6,7 +6,6 @@ import { PillTabs } from "@/components/PillTabs";
 import { Select } from "@/components/Select";
 import {
   getServerRankingSnapshot,
-  isRankingLoaded,
   readBundleRanking,
   readCumulativeRanking,
   refreshBundleRanking,
@@ -25,7 +24,8 @@ type Props = {
 export function RankingModal({ onClose }: Props) {
   const [tab, setTab] = useState<Tab>("cumulative");
   const [bundleId, setBundleId] = useState<string>("rainy_street");
-  const [isLoading, setIsLoading] = useState(() => !isRankingLoaded());
+  // 매 진입마다 로딩을 먼저 보여주고 동기화 완료 후 데이터 표시 (오래된 캐시 번쩍임 방지)
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     refreshRanking()
