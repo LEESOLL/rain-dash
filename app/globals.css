@@ -94,6 +94,21 @@ body {
   color: #fff;
   font-family: "PF Stardust", sans-serif;
   overscroll-behavior: none;
+  /* 텍스트 드래그 선택·롱프레스 콜아웃 차단 (게임 앱 느낌 유지) */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* 이미지 드래그·롱프레스 저장 차단 */
+img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+/* 입력 필드는 선택 허용 (닉네임 등) */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Tailwind font-mono utility를 PF Stardust로 강제 (unlayered가 utility보다 우선) */
