@@ -174,7 +174,7 @@ export function GameCanvas({ stage }: Props) {
         console.error("score submit failed", e),
       );
       if (!isAudioEnabled()) return;
-      const win = new Audio("/audio/win.wav");
+      const win = new Audio("/audio/win.mp3");
       win.volume = 0.6;
       win.play().catch(() => {});
       const scoreAudio = new Audio("/audio/score_rolling_up.mp3");
