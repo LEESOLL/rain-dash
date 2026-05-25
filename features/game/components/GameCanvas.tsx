@@ -9,7 +9,13 @@ import { getNextStageId } from "@/features/stage/stageRepository";
 import { setMainView } from "@/lib/mainView";
 import { useIsPortrait } from "@/lib/orientation";
 import { useIsTouch } from "@/lib/touch";
-import { clearBgm, isAudioEnabled, playBgm, stopBgm } from "@/lib/sound";
+import {
+  clearBgm,
+  isAudioEnabled,
+  playBgm,
+  playOnce,
+  stopBgm,
+} from "@/lib/sound";
 import type { Stage } from "@/features/stage/types";
 import { createEngine } from "../engine/createEngine";
 import { HEART_BONUS, VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "../engine/tuning";
@@ -30,15 +36,7 @@ export function GameCanvas({ stage }: Props) {
   // 표시용 진행률 = min(실제 로딩률, 경과시간/최소시간) — 캐시로 너무 빨리 끝나도 부드럽게
   const [displayProgress, setDisplayProgress] = useState(0);
   const loadedRef = useRef(0);
-  const [result, setResult] = useState<{
-    score: number;
-    timeBonus: number;
-    heartBonus: number;
-    heartCount: number;
-    total: number;
-    best: number;
-    isNewBest: boolean;
-  } | null>(null);
+  const [result, setResult] = useState<ResultData | null>(null);
   // 결과 카운트업 애니메이션 진행 시간(초)
   const [anim, setAnim] = useState(0);
   const portrait = useIsPortrait();
@@ -151,11 +149,7 @@ export function GameCanvas({ stage }: Props) {
 
   useEffect(() => {
     if (status === "dead") {
-      if (isAudioEnabled()) {
-        const audio = new Audio("/audio/game_over.mp3");
-        audio.volume = 0.6;
-        audio.play().catch(() => {});
-      }
+      playOnce("/audio/game_over.mp3", 0.6);
     } else if (status === "won") {
       const s = engineRef.current?.getState();
       if (s) {

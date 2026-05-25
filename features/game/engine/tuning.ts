@@ -22,7 +22,6 @@ export const PUDDLE_WIDTH_LONG = PUDDLE_WIDTH_SHORT * 2;
 
 export const RAIN_VX = -90;
 export const RAIN_VY = 540;
-export const RAIN_STREAK_LENGTH = 30;
 
 export const MAX_LIVES = 3;
 export const IFRAME_DURATION = 1.0;

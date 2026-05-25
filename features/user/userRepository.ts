@@ -27,13 +27,3 @@ export function createUser(nickname?: string): UserProfile {
   setData(KEY, profile);
   return profile;
 }
-
-export function changeNickname(nickname: string): UserProfile {
-  const trimmed = nickname.trim();
-  const existing = getUser();
-  if (!existing) return createUser(trimmed);
-  const next = trimmed.length > 0 ? trimmed : generateDefaultNickname();
-  const updated = { ...existing, nickname: next };
-  setData(KEY, updated);
-  return updated;
-}

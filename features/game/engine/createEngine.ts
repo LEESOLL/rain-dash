@@ -5,7 +5,7 @@ import type { Item, ItemType, Puddle, Shelter } from "@/features/stage/types";
 import type { Engine, EngineConfig, GameState } from "./types";
 
 export function createEngine(config: EngineConfig): Engine {
-  const { canvas, stage, onStateChange, onReady, onProgress } = config;
+  const { canvas, stage, onStateChange, onProgress } = config;
   const ctx = canvas.getContext("2d")!;
   const input = {
     left: false,
@@ -143,7 +143,6 @@ export function createEngine(config: EngineConfig): Engine {
     onProgress?.(totalAssets > 0 ? loadedAssets / totalAssets : 1);
     if (loadedAssets >= totalAssets && !assetsReady) {
       assetsReady = true;
-      onReady?.();
     }
   }
   let bgImage: CanvasImageSource | null = null;
