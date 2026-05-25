@@ -4,6 +4,9 @@ import type { UserProfile } from "./types";
 
 const KEY = "rd:user";
 
+/** 닉네임 최대 글자 수 (랭킹 표시 길이 고려) */
+export const MAX_NICKNAME_LENGTH = 12;
+
 export function generateDefaultNickname(): string {
   const num = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
   return `Dasher_${num}`;
@@ -17,7 +20,7 @@ export function createUser(nickname?: string): UserProfile {
   const existing = getUser();
   if (existing) return existing;
 
-  const cleaned = nickname?.trim();
+  const cleaned = nickname?.trim().slice(0, MAX_NICKNAME_LENGTH);
   const profile: UserProfile = {
     userId: generateId(),
     nickname:

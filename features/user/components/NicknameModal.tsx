@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { GameButton } from "@/components/GameButton";
 import { Modal } from "@/components/Modal";
-import { createUser } from "@/features/user/userRepository";
+import {
+  createUser,
+  MAX_NICKNAME_LENGTH,
+} from "@/features/user/userRepository";
 import { refreshUserCache } from "@/features/user/userStore";
 
 type Props = {
@@ -60,9 +63,11 @@ function NicknameModalContent({
         <input
           type="text"
           value={nicknameInput}
-          onChange={(e) => setNicknameInput(e.target.value)}
+          onChange={(e) =>
+            setNicknameInput(e.target.value.slice(0, MAX_NICKNAME_LENGTH))
+          }
           placeholder="Dasher_XXXX"
-          maxLength={20}
+          maxLength={MAX_NICKNAME_LENGTH}
           autoFocus
           enterKeyHint="done"
           className="text-input text-center"
